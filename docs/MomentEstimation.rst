@@ -9,4 +9,5 @@ of market invariants. This is a well studied problem and there are several
 methods to estimate the moments of the market invariants.
 
 .. automodule:: portfolioopt.moment_est
+
   .. autofunction:: sample_mean
