@@ -19,6 +19,14 @@ Installation
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   UserGuide
+   MomentEstimation
+   EfficientFrontier
+   OtherOptimisation
+   PostProcessing
+   Roadmap
+   Contributing
+   About
 
 
 
