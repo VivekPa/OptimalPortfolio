@@ -151,6 +151,48 @@
 <p>The core of optimising portfolios is determining the moments of the distribution
 of market invariants. This is a well studied problem and there are several
 methods to estimate the moments of the market invariants.</p>
+<span class="target" id="module-portfolioopt.moment_est"></span><p>The <code class="docutils literal notranslate"><span class="pre">moment_est</span></code> module estimates the moments of the distribution of market invariants using a number of methods.</p>
+<p>Currently implemented:
+- Exponentially weighted mean and covariance
+- Nonparametric estimators of mean, covariance and higher moments</p>
+<blockquote>
+<div><ul class="simple">
+<li>Gaussian kernel sample mean and covariance</li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>Maximum Likelihood estimators of mean, covariance and higher moments</dt>
+<dd><ul class="first last">
+<li>Normal distribution</li>
+<li>Student-t distribution</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Shrinkage estimators of mean, covariance and higher moments</dt>
+<dd><ul class="first last">
+<li>Ledoit Wolf shrinkage</li>
+<li>Oracle Approximating shrinkage</li>
+<li>Exponentially weighted shrinkage</li>
+<li>Novel nonparametric + MLE shrinkage</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="function">
+<dt id="portfolioopt.moment_est.sample_mean">
+<code class="descclassname">portfolioopt.moment_est.</code><code class="descname">sample_mean</code><span class="sig-paren">(</span><em>invariants</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.sample_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates sample mean
+:param invariants: sample data of market invariants
+:type invariants: pd.Dataframe
+:param frequency: time horizon of projection, default set to 252 days
+:type frequency: int
+:return: sample mean dataframe</p>
+</dd></dl>
+
 </div>
 
 

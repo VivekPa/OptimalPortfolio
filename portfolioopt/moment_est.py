@@ -19,7 +19,6 @@ import pandas as pd
 import numpy as np
 from sklearn import covariance
 from sklearn.covariance.shrunk_covariance_ import ledoit_wolf_shrinkage
-from portfolioopt.functions import *
 from scipy.stats import moment
 import warnings
 
