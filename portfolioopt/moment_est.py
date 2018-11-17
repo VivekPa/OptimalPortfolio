@@ -1,5 +1,5 @@
 """
-The moment_estimation module estimates the moments of the distribution of market invariants using a number of methods.
+The ``moment_est`` module estimates the moments of the distribution of market invariants using a number of methods.
 
 Currently implemented:
 - Exponentially weighted mean and covariance
@@ -19,11 +19,9 @@ import pandas as pd
 import numpy as np
 from sklearn import covariance
 from sklearn.covariance.shrunk_covariance_ import ledoit_wolf_shrinkage
-from portfolioopt.functions import Distributions
+from portfolioopt.functions import *
+from scipy.stats import moment
 import warnings
-
-data = np.array([[1,2,3], [2,3,1], [1,2,5], [1,2,1]])
-frame = pd.DataFrame(data)
 
 
 def sample_mean(invariants, frequency=252):
@@ -31,7 +29,7 @@ def sample_mean(invariants, frequency=252):
     Calculates sample mean
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
-    :param frequency: time horizon of projection
+    :param frequency: time horizon of projection, default set to 252 days
     :type frequency: int
     :return: sample mean dataframe
     """
@@ -47,7 +45,7 @@ def sample_cov(invariants, frequency=252):
     Calculates sample covariance
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
-    :param frequency: time horizon of projection
+    :param frequency: time horizon of projection, default set to 252 days
     :type frequency: int
     :return: sample covariance dataframe
     """
@@ -56,6 +54,46 @@ def sample_cov(invariants, frequency=252):
         invariants = pd.DataFrame(invariants)
     daily_cov = invariants.cov()
     return daily_cov*frequency
+
+
+def sample_skew(invariants, frequency=252):
+    """
+    Calculates sample skew
+    :param invariants: sample data of market invariants
+    :type invariants: pd.Dataframe
+    :param frequency: time horizon of projection, default set ot 252 days
+    :type frequency: int
+    :return: sample skew dataframe
+    """
+    if not isinstance(invariants, pd.DataFrame):
+        warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
+        invariants = pd.DataFrame(invariants)
+    daily_skew = moment(invariants, moment=3)
+    return daily_skew*(frequency**1.5)
+
+
+def sample_kurt(invariants, frequency=252):
+    """
+    Calculates sample kurtosis
+    :param invariants: sample data of market invariants
+    :type invariants: pd.Dataframe
+    :param frequency: time horizon of projection, default set to 252 days
+    :type frequency: int
+    :return: sample kurtosis dataframe
+    """
+    if not isinstance(invariants, pd.DataFrame):
+        warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
+        invariants = pd.DataFrame(invariants)
+    daily_kurt = moment(invariants, moment=4)
+    return daily_kurt*(frequency**2)
+
+
+def sample_moment(invariants, order, frequency=252):
+    if not isinstance(invariants, pd.DataFrame):
+        warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
+        invariants = pd.DataFrame(invariants)
+    daily_moment = moment(invariants, moment=order)
+    return daily_moment*frequency
 
 
 def exp_mean(invariants, span=180, frequency=252):
@@ -94,20 +132,60 @@ def exp_cov(invariants, span=180, frequency=252):
 
 class MLE:
     """
-    Provide methods to calculate maximum likelihood estimators (MLE) of mean, covariance and higher moments.
+    Provide methods to calculate maximum likelihood estimators (MLE) of mean, covariance and higher moments. Currently
+    implemented distributions:
+    - Normal
+
+    Instance variables:
+
+    - ``invariants`` (market invariants data)
+    - ``dist`` (distribution choice)
+    - ``n`` (number of assets
+    - ``mean`` (estimate of mean, initially None)
+    - ``cov`` (estimate of covariance, initially None)
+    - ``skew`` (estimate of skew, initially None)
+    - ``kurt`` (estimate of kurtosis, initially None)
+
+    Public methods:
+
+    - ``norm_est`` (calculates the normally distributed maximum likelihood estimate of mean, covariance, skew and
+    kurtosis)
     """
-    def __init__(self, invariants, n, dist="student_t"):
+    def __init__(self, invariants, n, dist="normal"):
         self.invariants = invariants
         self.dist = dist
         self.n = n
+        self.mean = None
+        self.cov = None
+        self.skew = None
+        self.kurt = None
 
-    def calc_likelihood(self, X):
-        return
+    def norm_est(self, invariants):
+        if self.dist == "normal":
+            self.mean = 1/self.n * np.sum(invariants)
+            self.cov = 1/self.n * np.dot((invariants - self.mean), np.transpose(invariants - self.mean))
+            self.skew = 0
+            self.kurt = 0
+        return self.mean, self.cov, self.skew, self.kurt
 
 
 class Shrinkage:
     """
-    Provide methods to calculate shrinkage estimators for mean, covariance and higher moments.
+    Provide methods to calculate shrinkage estimators for mean, covariance. Includes novel shrinkage estimator using
+    nonparametric and maximum likelihood estimators.
+
+    Instance variables:
+    - ``invariants`` (market invariants data)
+    - ``n`` (number of assets)
+    - ``frequency`` (investment time horizon, default set to 252 days)
+
+    Public methods:
+    - ``shrunk_covariance`` (calculates manually shrunk covariance matrix)
+    - ``ledoit_wolf`` (calculates optimal shrinkage using Ledoit-Wolf method)
+    - ``oracle_approximate`` (calculates optimal shrinkage using Oracle approximation)
+    - ``exp_ledoit`` (calculates optimal shrinkage of exponentially weighted covariance using Ledoit-Wolf method)
+    - ``param_mle`` (calculates manually shrunk covariance using nonparametric and maximum likelihood estimate of
+    covariance matrix)
     """
     def __init__(self, invariants, n, frequency=252):
         if not isinstance(invariants, pd.DataFrame):
@@ -158,7 +236,7 @@ class Shrinkage:
         shrunk_cov, self.delta = covariance.ledoit_wolf(X)
         return self._format_cov(shrunk_cov)
 
-    def oracle_approximating(self):
+    def oracle_approximation(self):
         """
         Calculates the Oracle Approximating Shrinkage estimate
         :return: shrunk sample covariance matrix
@@ -169,7 +247,32 @@ class Shrinkage:
         return self._format_cov(shrunk_cov)
 
     def exp_ledoit(self, X, block_size=1000):
+        """
+        Calculates the shrinkage of exponentially weighted covariance using Ledoit-Wolf shrinkage estimate.
+        :param X: market invariants data
+        :type X: pd.Dataframe
+        :param block_size: block size for Ledoit-Wolf calculation
+        :type block_size: int
+        :return: shrunk covariance matrix
+        """
         cov = exp_cov(X)
         shrinkage = ledoit_wolf_shrinkage(cov, block_size=block_size)
         shrunk_cov = (1 - shrinkage) * cov + shrinkage * (np.trace(cov)/self.n) * np.identity(self.n)
+        return shrunk_cov
+
+    def param_mle(self, X, n, shrinkage):
+        """
+        Calculates the shrinkage estimate of nonparametric and maximum likelihood estimate of covariance matrix
+        :param X: market invariants data
+        :type X: pd.Dataframe
+        :param n: number of assets
+        :type: n: int
+        :param shrinkage: shrinkage coefficient
+        :type shrinkage: int
+        :return: shrunk covariance matrix
+        """
+        mle = MLE(X, n, dist="normal")
+        mean, cov, skew, kurt = mle.norm_est(X)
+        param_cov = exp_cov(X)
+        shrunk_cov = (1 - shrinkage) * cov + shrinkage * param_cov
         return shrunk_cov

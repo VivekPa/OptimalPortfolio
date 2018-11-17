@@ -1,5 +1,5 @@
 """
-The invariants module calculates the market invariants for various securities and
+The ``invariants`` module calculates the market invariants for various securities and
 returns an usage dataframe of those invariants. So far invariants of these securities have been implemented:
 - Stocks
 - Forex

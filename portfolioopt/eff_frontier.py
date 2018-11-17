@@ -1,3 +1,13 @@
+"""
+This ``eff_frontier`` module calculates the optimal portfolio weights given the mean, covariance, skew and kurtosis of
+the data, for various utility functions. Currently implemented:
+- Maximum Sharpe Ratio
+- Minimum Volatility
+- Efficient Risk
+- Efficient Return
+
+"""
+
 import numpy as np
 import pandas as pd
 import scipy.optimize as scop
@@ -6,6 +16,36 @@ import portfolioopt.utility_functions as utility_functions
 
 
 class EfficientFrontier:
+    """
+    This ``EfficientFrontier`` class optimises portfolio weights for given utility function.
+
+    Instance variables:
+
+    - Inputs:
+
+        - ``n`` (number of assets)
+        - ``mean`` (mean of market invariants)
+        - ``cov`` (covariance of market invariants)
+        - ``weight_bounds`` (the bounds of portfolio weights)
+        - ``gamma`` (L2 regularisation coefficient)
+        - ``tickers`` (list of tickers of assets)
+
+    - Optimisation parameters:
+        - ``initial_guess`` (initial guess for portfolio weights, set to evenly distributed)
+        - ``constraints`` (constraints for optimisation)
+
+    - Outputs:
+        - ``weights`` (portfolio weights, initially set to None)
+
+
+    Public methods:
+    - ``max_sharpe()`` (calculates portfolio weights that maximises Sharpe Ratio)
+    - ``min_volatility()`` (calculates portfolio weights that minimises volatility)
+    - ``efficient_risk()`` (calculates portfolio weights that minimises efficient risk)
+    - ``efficient_return()`` (calculates portfolio weights that maximises efficient return)
+    - ``custom_objective()`` (calculates portfolio weights for custom utility function)
+    - ``portfolio_performance()`` (calculates portfolio performance and optionally prints it)
+    """
     def __init__(self, n, mean, cov, tickers, gamma, weight_bounds=(0, 1)):
         self.n = n
         self.mean = mean
@@ -16,6 +56,28 @@ class EfficientFrontier:
         self.gamma = gamma
         self.tickers = tickers
         self.weights = None
+        self.skew = None
+        self.kurt = None
+
+    def _make_valid_bounds(self, test_bounds):
+        """
+        Private method: process input bounds into a form acceptable by scipy.optimize,
+        and check the validity of said bounds.
+        :param test_bounds: minimum and maximum weight of an asset
+        :type test_bounds: tuple
+        :raises ValueError: if ``test_bounds`` is not a tuple of length two.
+        :raises ValueError: if the lower bound is too high
+        :return: a tuple of bounds, e.g ((0, 1), (0, 1), (0, 1) ...)
+        :rtype: tuple of tuples
+        """
+        if len(test_bounds) != 2 or not isinstance(test_bounds, tuple):
+            raise ValueError(
+                "test_bounds must be a tuple of (lower bound, upper bound)"
+            )
+        if test_bounds[0] is not None:
+            if test_bounds[0] * self.n > 1:
+                raise ValueError("Lower bound is too high")
+        return (test_bounds,) * self.n
 
     def max_sharpe(self, risk_free_rate=0.02):
         """
@@ -34,11 +96,11 @@ class EfficientFrontier:
         args = (self.mean, self.cov,
                 self.gamma, risk_free_rate)
         result = scop.minimize(
-            utility_functions.negative_sharpe,
+            utility_functions.sharpe,
             x0=self.initial_guess,
             args=args,
             method="SLSQP",
-            bounds=self.bounds,
+            bounds=self.weight_bounds,
             constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
@@ -55,28 +117,26 @@ class EfficientFrontier:
             x0=self.initial_guess,
             args=args,
             method="SLSQP",
-            bounds=self.bounds,
-            constraints=self.constraints,
-        )
+            bounds=self.weight_bounds,
+            constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
-    def custom_objective(self, objective_function, *args):
+    def custom_utility(self, utility_function, *args):
         """
-        Optimise some objective function. While an implicit requirement is that the function
-        can be optimised via a quadratic optimiser, this is not enforced. Thus there is a
-        decent chance of silent failure.
-        :param objective_function: function which maps (weight, args) -> cost
-        :type objective_function: function with signature (np.ndarray, args) -> float
+        Optimise some utility function. The utility function must be able to be optimised via quadratic programming,
+        any more complex might cause a failure to optimise.
+        :param utility_function: function which maps (weight, args) -> cost
+        :type utility_function: function with signature (np.ndarray, args) -> float
         :return: asset weights that optimise the custom objective
         :rtype: dict
         """
         result = scop.minimize(
-            objective_function,
+            utility_function,
             x0=self.initial_guess,
             args=args,
             method="SLSQP",
-            bounds=self.bounds,
+            bounds=self.weight_bounds,
             constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
@@ -111,7 +171,7 @@ class EfficientFrontier:
         # The equality constraint is either "weights sum to 1" (default), or
         # "weights sum to 0" (market neutral).
         if market_neutral:
-            if self.bounds[0][0] is not None and self.bounds[0][0] >= 0:
+            if self.weight_bounds[0][0] is not None and self.weight_bounds[0][0] >= 0:
                 warnings.warn(
                     "Market neutrality requires shorting - bounds have been amended",
                     RuntimeWarning)
@@ -123,11 +183,11 @@ class EfficientFrontier:
             constraints = self.constraints + [target_constraint]
 
         result = scop.minimize(
-            utility_functions.negative_sharpe,
+            utility_functions.sharpe,
             x0=self.initial_guess,
             args=args,
             method="SLSQP",
-            bounds=self.bounds,
+            bounds=self.weight_bounds,
             constraints=constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
@@ -177,6 +237,43 @@ class EfficientFrontier:
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
+    def moment_optimisation(self, skew, kurt, delta1, delta2, delta3, delta4, gamma=0.2):
+        """
+        Calculates the optimal portfolio weights for utility functions that uses mean, covariance, skew and kurtosis of
+        market invariants.
+        :param skew: skew of market invariants
+        :param kurt: kurtosis of market invariants
+        :param delta1: coefficient of mean, (i.e how much weight to give maximising mean)
+        :param delta2: coefficient of covariance, (i.e how much weight to give minimising covariance)
+        :param delta3: coefficient of skew, (i.e how much weight to give maximising skew)
+        :param delta4: coefficient of kurtosis, (i.e how much weight to give minimising kurtosis)
+        :param gamma: coefficient of L2 Regularisation (default set to 0.2)
+        :return: dictionary of tickers and weights
+        """
+        self.skew = skew
+        self.kurt = kurt
+        args = (self.mean, self.cov, skew, kurt, delta1, delta2, delta3, delta4, gamma)
+        result = scop.minimize(
+            utility_functions.moment_utility,
+            x0=self.initial_guess,
+            args=args,
+            method="SLSQP",
+            bounds=self.weight_bounds,
+            constraints=self.constraints)
+        self.weights = result["x"]
+        return dict(zip(self.tickers, self.weights))
+
+    def kelly_criterion(self, risk_free_rate=0.02):
+        """
+        Calculates the optimal portfolio weights according to Kelly's Criterion.
+        :param risk_free_rate: risk free rate of return
+        :type: float
+        :return: dictionary of tickers + weights
+        :rtype: dict
+        """
+        weights = (1+risk_free_rate)*(np.dot(np.invert(self.cov), (self.mean-risk_free_rate)))
+        return dict(zip(self.tickers, weights))
+
     def portfolio_performance(self, verbose=False, risk_free_rate=0.02):
         """
         After optimising, calculate (and optionally print) the performance of the optimal
@@ -185,7 +282,7 @@ class EfficientFrontier:
         :type verbose: bool, optional
         :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02
         :type risk_free_rate: float, optional
-        :raises ValueError: if weights have not been calcualted yet
+        :raises ValueError: if weights have not been calculated yet
         :return: expected return, volatility, Sharpe ratio.
         :rtype: (float, float, float)
         """
@@ -195,7 +292,7 @@ class EfficientFrontier:
             self.weights, self.cov))
         mu = self.weights.dot(self.mean)
 
-        sharpe = -utility_functions.negative_sharpe(
+        sharpe = -utility_functions.sharpe(
             self.weights, self.mean, self.cov, risk_free_rate
         )
         if verbose:

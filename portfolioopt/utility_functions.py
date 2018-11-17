@@ -1,24 +1,24 @@
 """
-The ``objective_functions`` module provides optimisation objectives, including the actual
-objective functions called by the ``EfficientFrontier`` object's optimisation methods.
+The ``utility_functions`` module provides common utility functions.
 These methods are primarily designed for internal use during optimisation (via
 scipy.optimize), and each requires a certain signature (which is why they have not been
-factored into a class). For obvious reasons, any objective function must accept ``weights``
-as an argument, and must also have at least one of ``expected_returns`` or ``cov_matrix``.
+factored into a class). The utility function must accept ``weights``
+as an argument, and must also have at least one of ``mean`` or ``cov``.
 Because scipy.optimize only minimises, any objectives that we want to maximise must be
 made negative.
 Currently implemented:
 - negative mean return
 - (regularised) negative Sharpe ratio
 - (regularised) volatility
-- CVaR (expected shortfall)
+- empirically distributed CVaR (expected shortfall)
+- mean, covariance, skew and kurtosis utility function
 """
 
 import numpy as np
 import scipy.stats
 
 
-def negative_mean_return(weights, expected_returns):
+def mean_return(weights, expected_returns):
     """
     Calculate the negative mean return of a portfolio
     :param weights: asset weights of the portfolio
@@ -31,7 +31,7 @@ def negative_mean_return(weights, expected_returns):
     return -weights.dot(expected_returns)
 
 
-def negative_sharpe(
+def sharpe(
     weights, expected_returns, cov_matrix, gamma=0, risk_free_rate=0.02
 ):
     """
@@ -58,9 +58,7 @@ def negative_sharpe(
 
 def volatility(weights, cov_matrix, gamma=0):
     """
-    Calculate the volatility of a portfolio. This is actually a misnomer because
-    the function returns variance, which is technically the correct objective
-    function when minimising volatility.
+    Calculate the volatility of a portfolio.
     :param weights: asset weights of the portfolio
     :type weights: np.ndarray
     :param cov_matrix: the covariance matrix of asset returns
@@ -76,11 +74,32 @@ def volatility(weights, cov_matrix, gamma=0):
     return portfolio_volatility + L2_reg
 
 
-def negative_cvar(weights, returns, s=10000, beta=0.95, random_state=None):
+def moment_utility(weights, mean, cov, skew, kurt, delta1, delta2, delta3, delta4, gamma):
     """
-    Calculate the negative CVaR. Though we want the "min CVaR portfolio", we
-    actually need to maximise the expected return of the worst q% cases, thus
-    we need this value to be negative.
+    Calculates the utility using mean, covariance, skew and kurtosis of data.
+    :param weights: portfolio weights
+    :param mean: mean of market invariants
+    :param cov: covariance of market invariants
+    :param skew: skew of market invariants
+    :param kurt: kurtosis of market invariants
+    :param delta1: coefficient of mean
+    :param delta2: coefficient of covariance
+    :param delta3: coefficient of skew
+    :param delta4: coefficient of kurtosis
+    :param gamma: coefficient of L2 regularisation
+    :return: portfolio utility
+    """
+    L2_reg = gamma * (weights ** 2).sum()
+    utility = delta1 * (np.dot(np.transpose(weights), mean)) - \
+              delta2 * (np.dot(np.dot(np.transpose(weights), cov), weights)) + \
+              delta3 * (np.dot(np.dot(np.transpose(weights), skew), weights)) - \
+              delta4 * (np.dot(np.dot(np.transpose(weights), kurt), weights)) + L2_reg
+    return -utility
+
+
+def empirical_cvar(weights, returns, s=10000, beta=0.95, random_state=None):
+    """
+    Calculate the negative CVaR.
     :param weights: asset weights of the portfolio
     :type weights: np.ndarray
     :param returns: asset returns
