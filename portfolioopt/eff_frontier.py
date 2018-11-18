@@ -1,10 +1,13 @@
 """
 This ``eff_frontier`` module calculates the optimal portfolio weights given the mean, covariance, skew and kurtosis of
 the data, for various utility functions. Currently implemented:
+
 - Maximum Sharpe Ratio
 - Minimum Volatility
 - Efficient Risk
 - Efficient Return
+- Moment Optimisation
+- Kelly Criterion
 
 """
 
@@ -31,22 +34,41 @@ class EfficientFrontier:
         - ``tickers`` (list of tickers of assets)
 
     - Optimisation parameters:
+
         - ``initial_guess`` (initial guess for portfolio weights, set to evenly distributed)
         - ``constraints`` (constraints for optimisation)
 
     - Outputs:
+
         - ``weights`` (portfolio weights, initially set to None)
 
 
     Public methods:
-    - ``max_sharpe()`` (calculates portfolio weights that maximises Sharpe Ratio)
-    - ``min_volatility()`` (calculates portfolio weights that minimises volatility)
-    - ``efficient_risk()`` (calculates portfolio weights that minimises efficient risk)
-    - ``efficient_return()`` (calculates portfolio weights that maximises efficient return)
-    - ``custom_objective()`` (calculates portfolio weights for custom utility function)
-    - ``portfolio_performance()`` (calculates portfolio performance and optionally prints it)
+
+        - ``max_sharpe()`` (calculates portfolio weights that maximises Sharpe Ratio)
+        - ``min_volatility()`` (calculates portfolio weights that minimises volatility)
+        - ``efficient_risk()`` (calculates portfolio weights that minimises efficient risk)
+        - ``efficient_return()`` (calculates portfolio weights that maximises efficient return)
+        - ``custom_objective()`` (calculates portfolio weights for custom utility function)
+        - ``portfolio_performance()`` (calculates portfolio performance and optionally prints it)
+
     """
     def __init__(self, n, mean, cov, tickers, gamma, weight_bounds=(0, 1)):
+        """
+
+        :param n: number of assets
+        :type n: int
+        :param mean: mean estimate of market invariants
+        :type mean: pd.Dataframe
+        :param cov: covariance estimate of market invariants
+        :type cov: pd.Dataframe
+        :param tickers: tickers of securities used
+        :type tickers: list
+        :param gamma: L2 regularisation coefficient
+        :type gamma: float
+        :param weight_bounds: bounds for portfolio weights. Change to (-1,1) for shorting
+        :type weight_bounds: tuple
+        """
         self.n = n
         self.mean = mean
         self.cov = cov
@@ -63,6 +85,7 @@ class EfficientFrontier:
         """
         Private method: process input bounds into a form acceptable by scipy.optimize,
         and check the validity of said bounds.
+
         :param test_bounds: minimum and maximum weight of an asset
         :type test_bounds: tuple
         :raises ValueError: if ``test_bounds`` is not a tuple of length two.
@@ -84,6 +107,7 @@ class EfficientFrontier:
         Maximise the Sharpe Ratio. The result is also referred to as the tangency portfolio,
         as it is the tangent to the efficient frontier curve that intercepts the risk-free
         rate.
+
         :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02
         :type risk_free_rate: float, optional
         :raises ValueError: if ``risk_free_rate`` is non-numeric
@@ -108,6 +132,7 @@ class EfficientFrontier:
     def min_volatility(self):
         """
         Minimise volatility.
+
         :return: asset weights for the volatility-minimising portfolio
         :rtype: dict
         """
@@ -126,6 +151,7 @@ class EfficientFrontier:
         """
         Optimise some utility function. The utility function must be able to be optimised via quadratic programming,
         any more complex might cause a failure to optimise.
+
         :param utility_function: function which maps (weight, args) -> cost
         :type utility_function: function with signature (np.ndarray, args) -> float
         :return: asset weights that optimise the custom objective
@@ -145,6 +171,7 @@ class EfficientFrontier:
         """
         Calculate the Sharpe-maximising portfolio for a given volatility (i.e max return
         for a target risk).
+
         :param target_risk: the desired volatility of the resulting portfolio.
         :type target_risk: float
         :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02
@@ -195,6 +222,7 @@ class EfficientFrontier:
     def efficient_return(self, target_return, market_neutral=False):
         """
         Calculate the 'Markowitz portfolio', minimising volatility for a given target return.
+
         :param target_return: the desired return of the resulting portfolio.
         :type target_return: float
         :param market_neutral: whether the portfolio should be market neutral (weights sum to zero),
@@ -241,6 +269,7 @@ class EfficientFrontier:
         """
         Calculates the optimal portfolio weights for utility functions that uses mean, covariance, skew and kurtosis of
         market invariants.
+
         :param skew: skew of market invariants
         :param kurt: kurtosis of market invariants
         :param delta1: coefficient of mean, (i.e how much weight to give maximising mean)
@@ -266,6 +295,7 @@ class EfficientFrontier:
     def kelly_criterion(self, risk_free_rate=0.02):
         """
         Calculates the optimal portfolio weights according to Kelly's Criterion.
+
         :param risk_free_rate: risk free rate of return
         :type: float
         :return: dictionary of tickers + weights
@@ -278,6 +308,7 @@ class EfficientFrontier:
         """
         After optimising, calculate (and optionally print) the performance of the optimal
         portfolio. Currently calculates expected return, volatility, and the Sharpe ratio.
+        
         :param verbose: whether performance should be printed, defaults to False
         :type verbose: bool, optional
         :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02

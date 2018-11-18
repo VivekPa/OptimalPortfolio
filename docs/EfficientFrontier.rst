@@ -11,3 +11,8 @@ include the Sharpe Ratio, efficient risk, return and minimum volatility. All of
 these have been implemented here.
 
 .. automodule:: portfolioopt.eff_frontier
+
+.. autoclass:: EfficientFrontier
+  :members:
+
+  .. automethod:: __init__
