@@ -3,6 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+ .. image:: ../media/logo_v2.png
+    :scale: 40 %
+    :align: center
+
+ .. raw:: html
+
+     <embed>
+         <p align="center">
+           <a href="https://www.python.org/">
+               <img src="https://ForTheBadge.com/images/badges/made-with-python.svg"
+                   alt="python"></a> &nbsp;
+           <a href="https://opensource.org/licenses/MIT">
+               <img src="https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square"
+                   alt="MIT license"></a> &nbsp;
+         </p>
+     </embed>
+
 PortfolioAnalytics is a robust open source library for Portfolio Optimisation
 and Analytics, that implements methods of optimising security portfolios.
 Classical techniques of efficient frontier are effectively implemented, along
