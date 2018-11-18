@@ -1,5 +1,5 @@
 <p align="center">
-    <img width=40% src="https://github.com/VivekPa/PortfolioAnalytics/blob/master/media/logo_v1.png">
+    <img width=40% src="https://github.com/VivekPa/PortfolioAnalytics/blob/master/media/logo_v2.png">
 </p>
 
 # PortfolioAnalytics
