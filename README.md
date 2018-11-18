@@ -13,7 +13,7 @@
 
 **PortfolioAnalytics** is a robust open source library for portfolio optimisation and analytics. This library implements classical portfolio optimisation methods such as Efficient Frontier, Sharpe ratio and Mean Variance, along with modern developments in the field such as Shrinkage estimators, Maximum likelihood estimators and Kelly Criterion. It also implements a novel shrinkage estimator and optimisation with higher moments. For a full documentation on the usage, head over to [ReadTheDocs](https://portfolioanalytics.readthedocs.io/en/latest/)
 
-Regardless of whether you are a fundamental investor, or an algorithmic trader, this library can aid you in allocating your capital in the most risk efficient way, allowing to optimise your utility. *For more details on the project design and similar content, please check out [Engineer Quant](https://medium.com/engineer-quant)
+Regardless of whether you are a fundamental investor, or an algorithmic trader, this library can aid you in allocating your capital in the most risk efficient way, allowing to optimise your utility. *For more details on the project design and similar content, please check out [Engineer Quant](https://medium.com/engineer-quant)*
 
 *Disclaimer: This is not trading or investment advice. Trading involves significant risk and do so at your risk.*
 
