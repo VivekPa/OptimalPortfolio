@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; PortfolioAnalytics  documentation</title>
+  <title>Market Invariants &mdash; PortfolioAnalytics  documentation</title>
   
 
   
@@ -27,7 +27,9 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Moment Estimation" href="MomentEstimation.html" />
+    <link rel="prev" title="User Guide" href="UserGuide.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -59,7 +61,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -76,9 +78,9 @@
               
             
             
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="UserGuide.html">User Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="MarketInvariants.html">Market Invariants</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Market Invariants</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MomentEstimation.html">Moment Estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EfficientFrontier.html">Efficient Frontier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="OtherOptimisation.html">Other Optimisation</a></li>
@@ -131,12 +133,14 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Search</li>
+      <li>Market Invariants</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
+            <a href="_sources/MarketInvariants.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -148,24 +152,37 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <div class="section" id="market-invariants">
+<h1>Market Invariants<a class="headerlink" href="#market-invariants" title="Permalink to this headline">¶</a></h1>
+<p>The first step in optimising portfolios is determining market invariants. A
+market invariant is some entity that does not change over time. In other words,
+given historical data, we can estimate the future with some notion of certainty,
+or at least some notion of probability. Every security has it’s own market
+invariant.</p>
+<span class="target" id="module-portfolioopt.invariants"></span><p>The <code class="docutils literal notranslate"><span class="pre">invariants</span></code> module calculates the market invariants for various securities and
+returns an usage dataframe of those invariants.</p>
+<p>Currently Implemented:</p>
+<ul class="simple">
+<li>Stocks</li>
+<li>Forex</li>
+</ul>
+<p>Future plans include fixed-income and derivatives market invariants.</p>
+</div>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="MomentEstimation.html" class="btn btn-neutral float-right" title="Moment Estimation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="UserGuide.html" class="btn btn-neutral" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -208,7 +225,6 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/javascript" src="_static/searchtools.js"></script>
     
 
   
@@ -219,14 +235,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>

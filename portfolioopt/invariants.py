@@ -1,9 +1,14 @@
 """
 The ``invariants`` module calculates the market invariants for various securities and
-returns an usage dataframe of those invariants. So far invariants of these securities have been implemented:
+returns an usage dataframe of those invariants.
+
+Currently Implemented:
+
 - Stocks
 - Forex
+
 Future plans include fixed-income and derivatives market invariants.
+
 """
 
 import numpy as np

@@ -2,17 +2,24 @@
 The ``moment_est`` module estimates the moments of the distribution of market invariants using a number of methods.
 
 Currently implemented:
+
 - Exponentially weighted mean and covariance
-- Nonparametric estimators of mean, covariance and higher moments
+- Nonparametric estimators of mean, covariance and higher moments:
+
     - Gaussian kernel sample mean and covariance
-- Maximum Likelihood estimators of mean, covariance and higher moments
+
+- Maximum Likelihood estimators of mean, covariance and higher moments:
+
     - Normal distribution
     - Student-t distribution
-- Shrinkage estimators of mean, covariance and higher moments
+
+- Shrinkage estimators of mean, covariance and higher moments:
+
     - Ledoit Wolf shrinkage
     - Oracle Approximating shrinkage
     - Exponentially weighted shrinkage
     - Novel nonparametric + MLE shrinkage
+
 """
 
 import pandas as pd
@@ -25,12 +32,14 @@ import warnings
 
 def sample_mean(invariants, frequency=252):
     """
-    Calculates sample mean
+    Calculates sample mean.
+
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
     :param frequency: time horizon of projection, default set to 252 days
     :type frequency: int
     :return: sample mean dataframe
+    :rtype: pd.Dataframe
     """
     if not isinstance(invariants, pd.DataFrame):
         warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
@@ -133,6 +142,7 @@ class MLE:
     """
     Provide methods to calculate maximum likelihood estimators (MLE) of mean, covariance and higher moments. Currently
     implemented distributions:
+
     - Normal
 
     Instance variables:
@@ -174,17 +184,20 @@ class Shrinkage:
     nonparametric and maximum likelihood estimators.
 
     Instance variables:
+
     - ``invariants`` (market invariants data)
     - ``n`` (number of assets)
     - ``frequency`` (investment time horizon, default set to 252 days)
 
     Public methods:
+
     - ``shrunk_covariance`` (calculates manually shrunk covariance matrix)
     - ``ledoit_wolf`` (calculates optimal shrinkage using Ledoit-Wolf method)
     - ``oracle_approximate`` (calculates optimal shrinkage using Oracle approximation)
     - ``exp_ledoit`` (calculates optimal shrinkage of exponentially weighted covariance using Ledoit-Wolf method)
     - ``param_mle`` (calculates manually shrunk covariance using nonparametric and maximum likelihood estimate of
     covariance matrix)
+
     """
     def __init__(self, invariants, n, frequency=252):
         if not isinstance(invariants, pd.DataFrame):

@@ -20,6 +20,7 @@ Installation
    :maxdepth: 2
 
    UserGuide
+   MarketInvariants
    MomentEstimation
    EfficientFrontier
    OtherOptimisation

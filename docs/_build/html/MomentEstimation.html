@@ -29,7 +29,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Efficient Frontier" href="EfficientFrontier.html" />
-    <link rel="prev" title="Installation" href="index.html" /> 
+    <link rel="prev" title="Market Invariants" href="MarketInvariants.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -79,9 +79,15 @@
             
             
               <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="UserGuide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MarketInvariants.html">Market Invariants</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Moment Estimation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="EfficientFrontier.html">Efficient Frontier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="OtherOptimisation.html">Other Optimisation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PostProcessing.html">Post Processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="About.html">About</a></li>
 </ul>
 
             
@@ -152,45 +158,95 @@
 of market invariants. This is a well studied problem and there are several
 methods to estimate the moments of the market invariants.</p>
 <span class="target" id="module-portfolioopt.moment_est"></span><p>The <code class="docutils literal notranslate"><span class="pre">moment_est</span></code> module estimates the moments of the distribution of market invariants using a number of methods.</p>
-<p>Currently implemented:
-- Exponentially weighted mean and covariance
-- Nonparametric estimators of mean, covariance and higher moments</p>
+<p>Currently implemented:</p>
+<ul>
+<li><p class="first">Exponentially weighted mean and covariance</p>
+</li>
+<li><p class="first">Nonparametric estimators of mean, covariance and higher moments:</p>
 <blockquote>
 <div><ul class="simple">
 <li>Gaussian kernel sample mean and covariance</li>
 </ul>
 </div></blockquote>
-<ul class="simple">
-<li><dl class="first docutils">
-<dt>Maximum Likelihood estimators of mean, covariance and higher moments</dt>
-<dd><ul class="first last">
+</li>
+<li><p class="first">Maximum Likelihood estimators of mean, covariance and higher moments:</p>
+<blockquote>
+<div><ul class="simple">
 <li>Normal distribution</li>
 <li>Student-t distribution</li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </li>
-<li><dl class="first docutils">
-<dt>Shrinkage estimators of mean, covariance and higher moments</dt>
-<dd><ul class="first last">
+<li><p class="first">Shrinkage estimators of mean, covariance and higher moments:</p>
+<blockquote>
+<div><ul class="simple">
 <li>Ledoit Wolf shrinkage</li>
 <li>Oracle Approximating shrinkage</li>
 <li>Exponentially weighted shrinkage</li>
 <li>Novel nonparametric + MLE shrinkage</li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </li>
 </ul>
 <dl class="function">
 <dt id="portfolioopt.moment_est.sample_mean">
 <code class="descclassname">portfolioopt.moment_est.</code><code class="descname">sample_mean</code><span class="sig-paren">(</span><em>invariants</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.sample_mean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates sample mean
+<dd><p>Calculates sample mean.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>frequency</strong> (<em>int</em>) – time horizon of projection, default set to 252 days</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">sample mean dataframe</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.Dataframe</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This is the textbook method for estimating the mean of market invariants:</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mu}:=\frac{1}{n}\sum_{i=1}^{n}x_{i}\]</div>
+<p>Although intuitive, this estimator has a number of issues. First, the
+number of data points required to produce an ‘good’ estimate is large.
+Second, the estimator is very sensitive to the data (has high variance).
+Therefore, this estimator is not the most effective.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This should not be the estimator that you use. Opt for more robust
+estimators such as maximum likelihood or shrinkage.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="portfolioopt.moment_est.sample_cov">
+<code class="descclassname">portfolioopt.moment_est.</code><code class="descname">sample_cov</code><span class="sig-paren">(</span><em>invariants</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.sample_cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates sample covariance
 :param invariants: sample data of market invariants
 :type invariants: pd.Dataframe
 :param frequency: time horizon of projection, default set to 252 days
 :type frequency: int
-:return: sample mean dataframe</p>
+:return: sample covariance dataframe</p>
+<p>This is the textbook method for estimating the covariance of market invariants:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\hat{\Sigma}:=\frac{1}{n}\sum_{i=1}^{n}(x_{i}-\hat{\mu})(x_{i}-\hat{\mu})^{T}\]</div>
+</div></blockquote>
+<p>Although intuitive, this estimator has a number of issues. First, the
+number of data points required to produce an ‘good’ estimate is large.
+Second, the estimator is very sensitive to the data (has high variance).
+Therefore, this estimator is not the most effective.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This should not be the estimator that you use. Opt for more robust
+estimators such as maximum likelihood or shrinkage.</p>
+</div>
 </dd></dl>
 
 </div>
@@ -206,7 +262,7 @@ methods to estimate the moments of the market invariants.</p>
         <a href="EfficientFrontier.html" class="btn btn-neutral float-right" title="Efficient Frontier" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="MarketInvariants.html" class="btn btn-neutral" title="Market Invariants" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
