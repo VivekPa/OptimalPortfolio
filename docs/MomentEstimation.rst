@@ -65,7 +65,7 @@ Maximum Likelihood Estimators
 =============================
 
 Maximum likelihood estimators aim to maximise the log probability of the occurrences
-of the data points [1], and find a suitable estimator for a specified distribution.
+of the data points [1]_, and find a suitable estimator for a specified distribution.
 Formally, we can write maximum likelihood estimators to be
 
 .. math::
@@ -87,7 +87,7 @@ The concept of shrinkage is very simple. Combine two estimators, one with high
 variance and one with high bias, to obtain an estimator that has the best qualities
 of both the individual estimators. For those familiar with machine learning, it
 akin to ensemble learning with the idea of combining weak learners to make one
-strong learner. For those interested to learn more, do check out the references [2]-[4].
+strong learner. For those interested to learn more, do check out the references [2]_-[4]_.
 
 .. autoclass:: Shrinkage
   :members:
