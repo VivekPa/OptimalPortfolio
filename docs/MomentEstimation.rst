@@ -86,3 +86,5 @@ strong learner.
 
 .. autoclass:: Shrinkage
   :members:
+
+  .. automethod:: __init__
