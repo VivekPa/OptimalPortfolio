@@ -72,7 +72,6 @@ of the data points, and find a suitable estimator for a specified distribution.
 
   .. automethod:: __init__
 
-  .. automethod:: norm_est
 
 
 
