@@ -11,6 +11,6 @@
             alt="MIT license"></a> &nbsp;
 </p>
 
-**PortfolioAnalytics** is a robust open source library for portfolio optimisation and analytics. This library implements classical portfolio optimisation methods such as Efficient Frontier, Sharpe ratio and Mean Variance, along with modern developments in the field such as Shrinkage estimators, Maximum likelihood estimators, Kelly Criterion. It also implements a novel shrinkage estimator and optimisation with higher moments. 
+**PortfolioAnalytics** is a robust open source library for portfolio optimisation and analytics. This library implements classical portfolio optimisation methods such as Efficient Frontier, Sharpe ratio and Mean Variance, along with modern developments in the field such as Shrinkage estimators, Maximum likelihood estimators and Kelly Criterion. It also implements a novel shrinkage estimator and optimisation with higher moments. 
 
 Regardless of whether you are a fundamental investor, or an algorithmic trader, this library can aid you in allocating your capital in the most risk efficient way, allowing to optimise your utility. 
