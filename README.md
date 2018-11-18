@@ -30,6 +30,8 @@ Regardless of whether you are a fundamental investor, or an algorithmic trader, 
 - [Other Optimisations](#other-optimisations)
     - [Kelly Criterion](#kelly-criterion)
     - [Higher Moment Optimisation](#higher-moment-optimisation)
+- [Utility Functions](#utility-functions)
+- [Advances](#advances)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 
@@ -98,7 +100,77 @@ The first step to optimising any portfolio is calculating market invariants. Mar
 Once the market invariants have been calculated, it is time to model the statistical properties of the invariants. This is a deeply researched and studied field and due to the nature of the complexity involved in modelling the statistical properties of large market data, I have tried my best to implement cutting edge procedures, but I welcome feedback and improvements.
 
 ### Nonparametric Estimators
-The simplest method of estimating the mean and covariance of invariants are the sample mean and covariance. However, this can be extended by introducing weightage for the timestamps, i.e giving more weight to recent data than older data. One novel approach I have taken is introducing exponentially weighted mean and covariance, which intutively has backing. 
+The simplest method of estimating the mean and covariance of invariants are the sample mean and covariance. However, this can be extended by introducing weightage for the timestamps, i.e giving more weight to recent data than older data. One novel approach I have taken is introducing exponentially weighted mean and covariance, which intutively has backing. The following have been implemented:
+
+- Sample Mean
+- Sample Covariance
+- Exponentially weighted mean
+- Exponentially weighted covariance
 
 ### Maximum Likelihood Estimators
-Maximum likelihood estimators (MLE) are intended to maximise the probability that the data points occur within a prescribed distribution. 
+Maximum likelihood estimators (MLE) are intended to maximise the probability that the data points occur within a prescribed distribution. The procedure hence involves choosing a distribution or a class of distributions and then fitting the data to the distritbution such that the log probability of the data points are maximised by the parameters of the distributions. This will in turn give us the optimal estimators of the distribution for market invariants. MLE has been implemented for the following distributions:
+
+- Multivariate Normal
+
+### Shrinkage Estimators
+Both nonparametric and MLE estimators require a large set of data and even then they might not produce the best estimators due to their inherent bias or lack there off. Akin to the bias-variance tradeoff in machine learning, too much bias and too much variance is not good in estimators. So, as a way to combine the two estimators, shrinkage was introduced. The idea is that you combine two weak estimators, one with high variance and the other with high bias, with some coefficient called the shrinkage coefficient, to produce a much better estimator. This is one of the cutting edge estimators and is still rigorously being researched. The following have been implemented:
+
+- Manual Shrinkage
+- Ledoit-Wolf Shrinkage
+- Oracle Approximation
+- Ledoit-Wolf Shrinkage for exponentially weighted moments
+- Nonparametric and MLE manual shrinkage
+
+## Efficient Frontier
+Classical asset allocation is the efficient frontier allocation. This is also known as the mean-variance optimisation as it takes into account the estimators of the mean and variance. The procedure of optimisation involves choosing an utility function and optimising it for portfolio weights.
+
+### Sharpe Ratio
+One of the most commonly used metric for portfolios is the Sharpe ratio, which is essentially the risk adjusted excess return on a portfolio. We can use the sharpe ratio as the utility function to optimise for our portfolio weights. 
+
+### Efficient Return
+Another utility function is the efficient return, which is maximising return for a given risk tolerance, chosen by the investor. 
+
+## Other Optimisations
+Apart from the classical mean-variance optimisation, I have tried to implement some new research in the area. 
+
+### Kelly Criterion
+This optimisation takes insiration from Game Theory and proposes an optimal strategy for betting, given the estimation of the odds. 
+
+### Higher Moment Optimisation
+The main drawback of the mean-variance approach is the lack of consideration of higher moments such as skew and kurtosis, which can provide useful information. I have attempted to incorporate skew and kurtosis in the optimisation and I allow the investor to choose the wieghts he/she would like to place on each of the moments.
+
+## Utility Functions
+Here is a list of the utility functions available for usage:
+
+- Sharpe Ratio
+- Volatility
+- Efficient Risk
+- Efficient Return
+- Kelly Criterion
+- Higher Moment Utility
+
+## Advances
+The main advances implemented in this library are the nonparametric + MLE shirnkage, exponentially weighted moments and higher moment optimisation. 
+
+## Roadmap
+I have the following planned out and am working on implementing them:
+
+- Market Invariants
+  - Calculating invariants for bonds and derivatives
+
+- Nonparametric Estimators
+  - Different kernels for data
+- Maximum Likelihood Estimators
+  - Student-t Distribution
+  - Stable Distributions
+- Shrinkage Estimators
+  - Optimal choosing of shrinkage for Nonparametric+MLE shrinkage
+  - Shrinkage for higher moments
+
+- Optimisations
+  - CVaR optimisation
+  - Monte Carlo simulations
+ 
+## Contributing
+I am always welcome to criticisms and suggestions regarding the library. 
+  
