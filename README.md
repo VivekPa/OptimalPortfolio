@@ -21,12 +21,23 @@ Regardless of whether you are a fundamental investor, or an algorithmic trader, 
 - [Quickstart](#quickstart)
 - [Market Invariants](#market-invariants)
 - [Moment Estimation](#moment-estimation)
+    - [Nonparametric Estimators](#nonparametric-estimators)
+    - [Maximum Likelihood Estimators](#maximum-likelihood-estimators)
+    - [Shrinkage Estimators](#shrinkage-estimators)
 - [Efficient Frontier](#efficient-frontier)
+    - [Sharpe Ratio](#sharpe-ratio)
+    - [Efficient Return](#efficient-return)
 - [Other Optimisations](#other-optimisations)
+    - [Kelly Criterion](#kelly-criterion)
+    - [Higher Moment Optimisation](#higher-moment-optimisation)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 
 ## Overview
+This library aims to make optimising portfolios accessible to every trader and investor. To install this library, download it and run
+```python
+run setup.py
+```
 
 ## Quickstart
 For those who want to see the library in action, run the following script:
@@ -80,3 +91,14 @@ Annual volatility: 34.4%
 Sharpe Ratio: -0.02
 ```
 
+## Market Invariants
+The first step to optimising any portfolio is calculating market invariants. Market invariants are defined as aspects of market prices that have some determinable statistical behaviour over time. For stock prices, the compounded returns are the market invariants. So when we calculate these invariants, we can statistically model them and gain useful insight into their behaviour. So far, calculating market invariants of stock prices and forex prices have been implemented. 
+
+## Moment Estimation
+Once the market invariants have been calculated, it is time to model the statistical properties of the invariants. This is a deeply researched and studied field and due to the nature of the complexity involved in modelling the statistical properties of large market data, I have tried my best to implement cutting edge procedures, but I welcome feedback and improvements.
+
+### Nonparametric Estimators
+The simplest method of estimating the mean and covariance of invariants are the sample mean and covariance. However, this can be extended by introducing weightage for the timestamps, i.e giving more weight to recent data than older data. One novel approach I have taken is introducing exponentially weighted mean and covariance, which intutively has backing. 
+
+### Maximum Likelihood Estimators
+Maximum likelihood estimators (MLE) are intended to maximise the probability that the data points occur within a prescribed distribution. 
