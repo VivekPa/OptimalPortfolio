@@ -404,14 +404,37 @@ implemented distributions:</p>
 <dl class="method">
 <dt id="portfolioopt.moment_est.MLE.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>invariants</em>, <em>n</em>, <em>dist='normal'</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.MLE.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>n</strong> (<em>int</em>) – number of assets</li>
+<li><strong>dist</strong> (<em>str</em>) – choice of distribution: “normal”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="portfolioopt.moment_est.MLE.norm_est">
-<code class="descname">norm_est</code><span class="sig-paren">(</span><em>invariants</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.MLE.norm_est" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uses MLE to estimate the mean, covariance, skew and kurtosis of market invariants, assuming
+<code class="descname">norm_est</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.MLE.norm_est" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates MLE estimate of mean, covariance, skew and kurtosis, assuming normal distribution
+:return: dataframes of mean, covariance, skew and kurtosis
+:rtype: pd.Dataframe</p>
+<p>Uses MLE to estimate the mean, covariance, skew and kurtosis of market invariants, assuming
 their come from the normal distribution.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">norm_est</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Calculates MLE estimate of mean, covariance, skew and kurtosis, assuming normal distribution
+:return: dataframes of mean, covariance, skew and kurtosis
+:rtype: pd.Dataframe</p>
 </dd></dl>
 
 </dd></dl>
@@ -443,6 +466,192 @@ nonparametric and maximum likelihood estimators.</p>
 <li><code class="docutils literal notranslate"><span class="pre">exp_ledoit</span></code> (calculates optimal shrinkage of exponentially weighted covariance using Ledoit-Wolf method)</li>
 <li><code class="docutils literal notranslate"><span class="pre">param_mle</span></code> (calculates manually shrunk covariance using nonparametric and maximum likelihood estimate of covariance matrix)</li>
 </ul>
+<dl class="method">
+<dt id="portfolioopt.moment_est.Shrinkage.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>invariants</em>, <em>n</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.Shrinkage.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>n</strong> (<em>int</em>) – number of assets</li>
+<li><strong>frequency</strong> (<em>int</em>) – time horizon of projection</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="portfolioopt.moment_est.Shrinkage.shrunk_covariance">
+<code class="descname">shrunk_covariance</code><span class="sig-paren">(</span><em>delta=0.2</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.Shrinkage.shrunk_covariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shrink a sample covariance matrix to the identity matrix (scaled by the average
+sample variance). This method does not estimate an optimal shrinkage parameter,
+it requires manual input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>delta</strong> (<em>float</em><em>, </em><em>optional</em>) – shrinkage parameter, defaults to 0.2.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">shrunk sample covariance matrix</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.Dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="portfolioopt.moment_est.Shrinkage.ledoit_wolf">
+<code class="descname">ledoit_wolf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.Shrinkage.ledoit_wolf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Ledoit-Wolf shrinkage estimate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">shrunk sample covariance matrix</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pd.Dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="portfolioopt.moment_est.Shrinkage.oracle_approximation">
+<code class="descname">oracle_approximation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.Shrinkage.oracle_approximation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the Oracle Approximating Shrinkage estimate</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">shrunk sample covariance matrix</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pd.Dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="portfolioopt.moment_est.Shrinkage.exp_ledoit">
+<code class="descname">exp_ledoit</code><span class="sig-paren">(</span><em>block_size=1000</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.Shrinkage.exp_ledoit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the shrinkage of exponentially weighted covariance using Ledoit-Wolf shrinkage estimate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>block_size</strong> (<em>int</em>) – block size for Ledoit-Wolf calculation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">shrunk covariance matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="portfolioopt.moment_est.Shrinkage.param_mle">
+<code class="descname">param_mle</code><span class="sig-paren">(</span><em>shrinkage</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.Shrinkage.param_mle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the shrinkage estimate of nonparametric and maximum likelihood estimate of covariance matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>shrinkage</strong> (<em>int</em>) – shrinkage coefficient</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">shrunk covariance matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">exp_ledoit</code><span class="sig-paren">(</span><em>block_size=1000</em><span class="sig-paren">)</span></dt>
+<dd><p>Calculates the shrinkage of exponentially weighted covariance using Ledoit-Wolf shrinkage estimate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>block_size</strong> (<em>int</em>) – block size for Ledoit-Wolf calculation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">shrunk covariance matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">ledoit_wolf</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Calculates the Ledoit-Wolf shrinkage estimate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">shrunk sample covariance matrix</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pd.Dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">oracle_approximation</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Calculates the Oracle Approximating Shrinkage estimate</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">shrunk sample covariance matrix</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">pd.Dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">param_mle</code><span class="sig-paren">(</span><em>shrinkage</em><span class="sig-paren">)</span></dt>
+<dd><p>Calculates the shrinkage estimate of nonparametric and maximum likelihood estimate of covariance matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>shrinkage</strong> (<em>int</em>) – shrinkage coefficient</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">shrunk covariance matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">shrunk_covariance</code><span class="sig-paren">(</span><em>delta=0.2</em><span class="sig-paren">)</span></dt>
+<dd><p>Shrink a sample covariance matrix to the identity matrix (scaled by the average
+sample variance). This method does not estimate an optimal shrinkage parameter,
+it requires manual input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>delta</strong> (<em>float</em><em>, </em><em>optional</em>) – shrinkage parameter, defaults to 0.2.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">shrunk sample covariance matrix</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pd.Dataframe</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>

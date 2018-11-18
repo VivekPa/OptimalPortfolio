@@ -176,6 +176,15 @@ class MLE:
     - ``norm_est`` (calculates the normally distributed maximum likelihood estimate of mean, covariance, skew and kurtosis)
     """
     def __init__(self, invariants, n, dist="normal"):
+        """
+
+        :param invariants: sample data of market invariants
+        :type invariants: pd.Dataframe
+        :param n: number of assets
+        :type n: int
+        :param dist: choice of distribution: "normal"
+        :type dist: str
+        """
         self.invariants = invariants
         self.dist = dist
         self.n = n
@@ -184,10 +193,15 @@ class MLE:
         self.skew = None
         self.kurt = None
 
-    def norm_est(self, invariants):
+    def norm_est(self):
+        """
+        Calculates MLE estimate of mean, covariance, skew and kurtosis, assuming normal distribution
+        :return: dataframes of mean, covariance, skew and kurtosis
+        :rtype: pd.Dataframe
+        """
         if self.dist == "normal":
-            self.mean = 1/self.n * np.sum(invariants)
-            self.cov = 1/self.n * np.dot((invariants - self.mean), np.transpose(invariants - self.mean))
+            self.mean = 1/self.n * np.sum(self.invariants)
+            self.cov = 1/self.n * np.dot((self.invariants - self.mean), np.transpose(self.invariants - self.mean))
             self.skew = 0
             self.kurt = 0
         return self.mean, self.cov, self.skew, self.kurt
@@ -214,6 +228,15 @@ class Shrinkage:
 
     """
     def __init__(self, invariants, n, frequency=252):
+        """
+
+        :param invariants: sample data of market invariants
+        :type invariants: pd.Dataframe
+        :param n: number of assets
+        :type n: int
+        :param frequency: time horizon of projection
+        :type frequency: int
+        """
         if not isinstance(invariants, pd.DataFrame):
             warnings.warn("invariants is not pd.Dataframe", RuntimeWarning)
         self.invariants = invariants
@@ -225,6 +248,7 @@ class Shrinkage:
         """
         Helper method which annualises the output of shrinkage covariance,
         and formats the result into a dataframe.
+
         :param raw_cov: raw covariance matrix of daily returns
         :type raw_cov: np.ndarray
         :return: annualised covariance matrix
@@ -238,6 +262,7 @@ class Shrinkage:
         Shrink a sample covariance matrix to the identity matrix (scaled by the average
         sample variance). This method does not estimate an optimal shrinkage parameter,
         it requires manual input.
+
         :param delta: shrinkage parameter, defaults to 0.2.
         :type delta: float, optional
         :return: shrunk sample covariance matrix
@@ -255,6 +280,7 @@ class Shrinkage:
     def ledoit_wolf(self):
         """
         Calculates the Ledoit-Wolf shrinkage estimate.
+
         :return: shrunk sample covariance matrix
         :rtype: pd.Dataframe
         """
@@ -265,6 +291,7 @@ class Shrinkage:
     def oracle_approximation(self):
         """
         Calculates the Oracle Approximating Shrinkage estimate
+
         :return: shrunk sample covariance matrix
         :rtype: pd.Dataframe
         """
@@ -272,33 +299,29 @@ class Shrinkage:
         shrunk_cov, self.delta = covariance.oas(X)
         return self._format_cov(shrunk_cov)
 
-    def exp_ledoit(self, X, block_size=1000):
+    def exp_ledoit(self, block_size=1000):
         """
         Calculates the shrinkage of exponentially weighted covariance using Ledoit-Wolf shrinkage estimate.
-        :param X: market invariants data
-        :type X: pd.Dataframe
+
         :param block_size: block size for Ledoit-Wolf calculation
         :type block_size: int
         :return: shrunk covariance matrix
         """
-        cov = exp_cov(X)
+        cov = exp_cov(self.invariants)
         shrinkage = ledoit_wolf_shrinkage(cov, block_size=block_size)
         shrunk_cov = (1 - shrinkage) * cov + shrinkage * (np.trace(cov)/self.n) * np.identity(self.n)
         return shrunk_cov
 
-    def param_mle(self, X, n, shrinkage):
+    def param_mle(self, shrinkage):
         """
         Calculates the shrinkage estimate of nonparametric and maximum likelihood estimate of covariance matrix
-        :param X: market invariants data
-        :type X: pd.Dataframe
-        :param n: number of assets
-        :type: n: int
+
         :param shrinkage: shrinkage coefficient
         :type shrinkage: int
         :return: shrunk covariance matrix
         """
-        mle = MLE(X, n, dist="normal")
+        mle = MLE(self.invariants, self.n, dist="normal")
         mean, cov, skew, kurt = mle.norm_est(X)
-        param_cov = exp_cov(X)
+        param_cov = exp_cov(self.invariants)
         shrunk_cov = (1 - shrinkage) * cov + shrinkage * param_cov
         return shrunk_cov
