@@ -1,8 +1,3 @@
-.. PortfolioAnalytics documentation master file, created by
-   sphinx-quickstart on Sat Nov 17 11:42:20 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
  .. image:: ../media/logo_v2.png
     :scale: 40 %
     :align: center
