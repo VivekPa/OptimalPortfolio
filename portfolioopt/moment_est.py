@@ -165,7 +165,7 @@ class MLE:
 
     - ``invariants`` (market invariants data)
     - ``dist`` (distribution choice)
-    - ``n`` (number of assets
+    - ``n`` (number of assets)
     - ``mean`` (estimate of mean, initially None)
     - ``cov`` (estimate of covariance, initially None)
     - ``skew`` (estimate of skew, initially None)
@@ -196,6 +196,7 @@ class MLE:
     def norm_est(self):
         """
         Calculates MLE estimate of mean, covariance, skew and kurtosis, assuming normal distribution
+        
         :return: dataframes of mean, covariance, skew and kurtosis
         :rtype: pd.Dataframe
         """

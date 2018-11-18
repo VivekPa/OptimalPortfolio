@@ -74,8 +74,7 @@ of the data points, and find a suitable estimator for a specified distribution.
 
   .. automethod:: norm_est
 
-    Uses MLE to estimate the mean, covariance, skew and kurtosis of market invariants, assuming
-    their come from the normal distribution.
+
 
 Shrinkage Estimators
 ====================
