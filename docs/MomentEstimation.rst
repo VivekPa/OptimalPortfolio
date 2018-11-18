@@ -86,15 +86,3 @@ strong learner.
 
 .. autoclass:: Shrinkage
   :members:
-
-  .. automethod:: __init__
-
-  .. automethod:: shrunk_covariance
-
-  .. automethod:: ledoit_wolf
-
-  .. automethod:: oracle_approximation
-
-  .. automethod:: exp_ledoit
-
-  .. automethod:: param_mle
