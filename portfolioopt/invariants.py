@@ -23,7 +23,8 @@ def stock_invariants(prices, no_assets):
     :type prices: pd Dataframe
     :param no_assets: number of assets in data
     :type no_assets: int
-    :return: pd Dataframe of stock invariants
+    :return: dataframe of stock invariants
+    :rtype: pd.Dataframe
     """
     if not isinstance(prices, pd.DataFrame):
         warnings.warn("prices are not a pd Dataframe", RuntimeWarning)
@@ -45,7 +46,8 @@ def forex_invariants(prices, no_assets):
     :type prices: pd Dataframe
     :param no_assets: number of assets in data
     :type no_assets: int
-    :return: pd Dataframe of stock invariants
+    :return: dataframe of stock invariants
+    :rtype: pd.Dataframe
     """
     if not isinstance(prices, pd.DataFrame):
         warnings.warn("prices are not a pd Dataframe", RuntimeWarning)

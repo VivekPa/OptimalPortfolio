@@ -81,7 +81,11 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="UserGuide.html">User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="MarketInvariants.html">Market Invariants</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Moment Estimation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Moment Estimation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#maximum-likelihood-estimators">Maximum Likelihood Estimators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#shrinkage-estimators">Shrinkage Estimators</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="EfficientFrontier.html">Efficient Frontier</a></li>
 <li class="toctree-l1"><a class="reference internal" href="OtherOptimisation.html">Other Optimisation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="PostProcessing.html">Post Processing</a></li>
@@ -227,12 +231,22 @@ estimators such as maximum likelihood or shrinkage.</p>
 <dl class="function">
 <dt id="portfolioopt.moment_est.sample_cov">
 <code class="descclassname">portfolioopt.moment_est.</code><code class="descname">sample_cov</code><span class="sig-paren">(</span><em>invariants</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.sample_cov" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates sample covariance
-:param invariants: sample data of market invariants
-:type invariants: pd.Dataframe
-:param frequency: time horizon of projection, default set to 252 days
-:type frequency: int
-:return: sample covariance dataframe</p>
+<dd><p>Calculates sample covariance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>frequency</strong> (<em>int</em>) – time horizon of projection, default set to 252 days</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sample covariance dataframe</p>
+</td>
+</tr>
+</tbody>
+</table>
 <p>This is the textbook method for estimating the covariance of market invariants:</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
@@ -249,6 +263,189 @@ estimators such as maximum likelihood or shrinkage.</p>
 </div>
 </dd></dl>
 
+<dl class="function">
+<dt id="portfolioopt.moment_est.sample_skew">
+<code class="descclassname">portfolioopt.moment_est.</code><code class="descname">sample_skew</code><span class="sig-paren">(</span><em>invariants</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.sample_skew" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates sample skew</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>frequency</strong> (<em>int</em>) – time horizon of projection, default set ot 252 days</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sample skew dataframe</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Calculates the sample skew of the market invariants.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="portfolioopt.moment_est.sample_kurt">
+<code class="descclassname">portfolioopt.moment_est.</code><code class="descname">sample_kurt</code><span class="sig-paren">(</span><em>invariants</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.sample_kurt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates sample kurtosis</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>frequency</strong> (<em>int</em>) – time horizon of projection, default set to 252 days</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sample kurtosis dataframe</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Calculates the sample kurtosis of the market invariants.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="portfolioopt.moment_est.sample_moment">
+<code class="descclassname">portfolioopt.moment_est.</code><code class="descname">sample_moment</code><span class="sig-paren">(</span><em>invariants</em>, <em>order</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.sample_moment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates nth moment of sample data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>order</strong> (<em>int</em>) – order of moment</li>
+<li><strong>frequency</strong> (<em>int</em>) – time horizon of projection</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">nth moment of sample invariants</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Calculates the nth moment of the sample of market invariants.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="portfolioopt.moment_est.exp_mean">
+<code class="descclassname">portfolioopt.moment_est.</code><code class="descname">exp_mean</code><span class="sig-paren">(</span><em>invariants</em>, <em>span=180</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.exp_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates sample exponentially weighted mean</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>frequency</strong> (<em>int</em>) – time horizon of projection</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sample exponentially weighted mean dataframe</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Calculates the exponentially weighted sample mean of market invariants.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="portfolioopt.moment_est.exp_cov">
+<code class="descclassname">portfolioopt.moment_est.</code><code class="descname">exp_cov</code><span class="sig-paren">(</span><em>invariants</em>, <em>span=180</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.exp_cov" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates sample exponentially weighted covariance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>invariants</strong> (<em>pd.Dataframe</em>) – sample data of market invariants</li>
+<li><strong>frequency</strong> (<em>int</em>) – time horizon of projection</li>
+<li><strong>span</strong> – the span for exponential weights</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sample exponentially weighted covariance dataframe</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Calculates the exponentially weighted sample covariance of market invariants.</p>
+</dd></dl>
+
+<div class="section" id="maximum-likelihood-estimators">
+<h2>Maximum Likelihood Estimators<a class="headerlink" href="#maximum-likelihood-estimators" title="Permalink to this headline">¶</a></h2>
+<p>Maximum likelihood estimators aim to maximise the log probability of the occurrences
+of the data points, and find a suitable estimator for a specified distribution.</p>
+<dl class="class">
+<dt id="portfolioopt.moment_est.MLE">
+<em class="property">class </em><code class="descclassname">portfolioopt.moment_est.</code><code class="descname">MLE</code><span class="sig-paren">(</span><em>invariants</em>, <em>n</em>, <em>dist='normal'</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.MLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide methods to calculate maximum likelihood estimators (MLE) of mean, covariance and higher moments. Currently
+implemented distributions:</p>
+<ul class="simple">
+<li>Normal</li>
+</ul>
+<p>Instance variables:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">invariants</span></code> (market invariants data)</li>
+<li><code class="docutils literal notranslate"><span class="pre">dist</span></code> (distribution choice)</li>
+<li><code class="docutils literal notranslate"><span class="pre">n</span></code> (number of assets</li>
+<li><code class="docutils literal notranslate"><span class="pre">mean</span></code> (estimate of mean, initially None)</li>
+<li><code class="docutils literal notranslate"><span class="pre">cov</span></code> (estimate of covariance, initially None)</li>
+<li><code class="docutils literal notranslate"><span class="pre">skew</span></code> (estimate of skew, initially None)</li>
+<li><code class="docutils literal notranslate"><span class="pre">kurt</span></code> (estimate of kurtosis, initially None)</li>
+</ul>
+<p>Public methods:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">norm_est</span></code> (calculates the normally distributed maximum likelihood estimate of mean, covariance, skew and kurtosis)</li>
+</ul>
+<dl class="method">
+<dt id="portfolioopt.moment_est.MLE.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>invariants</em>, <em>n</em>, <em>dist='normal'</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.MLE.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="portfolioopt.moment_est.MLE.norm_est">
+<code class="descname">norm_est</code><span class="sig-paren">(</span><em>invariants</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.MLE.norm_est" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses MLE to estimate the mean, covariance, skew and kurtosis of market invariants, assuming
+their come from the normal distribution.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="shrinkage-estimators">
+<h2>Shrinkage Estimators<a class="headerlink" href="#shrinkage-estimators" title="Permalink to this headline">¶</a></h2>
+<p>The concept of shrinkage is very simple. Combine two estimators, one with high
+variance and one with high bias, to obtain an estimator that has the best qualities
+of both the individual estimators. For those familiar with machine learning, it
+akin to ensemble learning with the idea of combining weak learners to make one
+strong learner.</p>
+<dl class="class">
+<dt id="portfolioopt.moment_est.Shrinkage">
+<em class="property">class </em><code class="descclassname">portfolioopt.moment_est.</code><code class="descname">Shrinkage</code><span class="sig-paren">(</span><em>invariants</em>, <em>n</em>, <em>frequency=252</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.moment_est.Shrinkage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide methods to calculate shrinkage estimators for mean, covariance. Includes novel shrinkage estimator using
+nonparametric and maximum likelihood estimators.</p>
+<p>Instance variables:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">invariants</span></code> (market invariants data)</li>
+<li><code class="docutils literal notranslate"><span class="pre">n</span></code> (number of assets)</li>
+<li><code class="docutils literal notranslate"><span class="pre">frequency</span></code> (investment time horizon, default set to 252 days)</li>
+</ul>
+<p>Public methods:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">shrunk_covariance</span></code> (calculates manually shrunk covariance matrix)</li>
+<li><code class="docutils literal notranslate"><span class="pre">ledoit_wolf</span></code> (calculates optimal shrinkage using Ledoit-Wolf method)</li>
+<li><code class="docutils literal notranslate"><span class="pre">oracle_approximate</span></code> (calculates optimal shrinkage using Oracle approximation)</li>
+<li><code class="docutils literal notranslate"><span class="pre">exp_ledoit</span></code> (calculates optimal shrinkage of exponentially weighted covariance using Ledoit-Wolf method)</li>
+<li><code class="docutils literal notranslate"><span class="pre">param_mle</span></code> (calculates manually shrunk covariance using nonparametric and maximum likelihood estimate of covariance matrix)</li>
+</ul>
+</dd></dl>
+
+</div>
 </div>
 
 

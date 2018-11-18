@@ -40,3 +40,50 @@ methods to estimate the moments of the market invariants.
     .. note::
       This should not be the estimator that you use. Opt for more robust
       estimators such as maximum likelihood or shrinkage.
+
+  .. autofunction:: sample_skew
+
+    Calculates the sample skew of the market invariants.
+
+  .. autofunction:: sample_kurt
+
+    Calculates the sample kurtosis of the market invariants.
+
+  .. autofunction:: sample_moment
+
+    Calculates the nth moment of the sample of market invariants.
+
+  .. autofunction:: exp_mean
+
+    Calculates the exponentially weighted sample mean of market invariants.
+
+  .. autofunction:: exp_cov
+
+    Calculates the exponentially weighted sample covariance of market invariants.
+
+Maximum Likelihood Estimators
+=============================
+
+Maximum likelihood estimators aim to maximise the log probability of the occurrences
+of the data points, and find a suitable estimator for a specified distribution.
+
+.. autoclass:: MLE
+  :members:
+
+  .. automethod:: __init__
+
+  .. automethod:: norm_est
+
+    Uses MLE to estimate the mean, covariance, skew and kurtosis of market invariants, assuming
+    their come from the normal distribution.
+
+Shrinkage Estimators
+====================
+
+The concept of shrinkage is very simple. Combine two estimators, one with high
+variance and one with high bias, to obtain an estimator that has the best qualities
+of both the individual estimators. For those familiar with machine learning, it
+akin to ensemble learning with the idea of combining weak learners to make one
+strong learner.
+
+.. autoclass:: Shrinkage

@@ -51,6 +51,7 @@ def sample_mean(invariants, frequency=252):
 def sample_cov(invariants, frequency=252):
     """
     Calculates sample covariance
+
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
     :param frequency: time horizon of projection, default set to 252 days
@@ -67,6 +68,7 @@ def sample_cov(invariants, frequency=252):
 def sample_skew(invariants, frequency=252):
     """
     Calculates sample skew
+
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
     :param frequency: time horizon of projection, default set ot 252 days
@@ -83,6 +85,7 @@ def sample_skew(invariants, frequency=252):
 def sample_kurt(invariants, frequency=252):
     """
     Calculates sample kurtosis
+
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
     :param frequency: time horizon of projection, default set to 252 days
@@ -97,6 +100,17 @@ def sample_kurt(invariants, frequency=252):
 
 
 def sample_moment(invariants, order, frequency=252):
+    """
+    Calculates nth moment of sample data.
+
+    :param invariants: sample data of market invariants
+    :type invariants: pd.Dataframe
+    :param order: order of moment
+    :type order: int
+    :param frequency: time horizon of projection
+    :type frequency: int
+    :return: nth moment of sample invariants
+    """
     if not isinstance(invariants, pd.DataFrame):
         warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
         invariants = pd.DataFrame(invariants)
@@ -107,6 +121,7 @@ def sample_moment(invariants, order, frequency=252):
 def exp_mean(invariants, span=180, frequency=252):
     """
     Calculates sample exponentially weighted mean
+
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
     :param frequency: time horizon of projection
@@ -123,6 +138,7 @@ def exp_mean(invariants, span=180, frequency=252):
 def exp_cov(invariants, span=180, frequency=252):
     """
     Calculates sample exponentially weighted covariance
+
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
     :param frequency: time horizon of projection
@@ -157,8 +173,7 @@ class MLE:
 
     Public methods:
 
-    - ``norm_est`` (calculates the normally distributed maximum likelihood estimate of mean, covariance, skew and
-    kurtosis)
+    - ``norm_est`` (calculates the normally distributed maximum likelihood estimate of mean, covariance, skew and kurtosis)
     """
     def __init__(self, invariants, n, dist="normal"):
         self.invariants = invariants
@@ -195,8 +210,7 @@ class Shrinkage:
     - ``ledoit_wolf`` (calculates optimal shrinkage using Ledoit-Wolf method)
     - ``oracle_approximate`` (calculates optimal shrinkage using Oracle approximation)
     - ``exp_ledoit`` (calculates optimal shrinkage of exponentially weighted covariance using Ledoit-Wolf method)
-    - ``param_mle`` (calculates manually shrunk covariance using nonparametric and maximum likelihood estimate of
-    covariance matrix)
+    - ``param_mle`` (calculates manually shrunk covariance using nonparametric and maximum likelihood estimate of covariance matrix)
 
     """
     def __init__(self, invariants, n, frequency=252):

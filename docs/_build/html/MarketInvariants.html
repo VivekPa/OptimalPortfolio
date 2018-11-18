@@ -167,6 +167,48 @@ returns an usage dataframe of those invariants.</p>
 <li>Forex</li>
 </ul>
 <p>Future plans include fixed-income and derivatives market invariants.</p>
+<dl class="function">
+<dt id="portfolioopt.invariants.stock_invariants">
+<code class="descclassname">portfolioopt.invariants.</code><code class="descname">stock_invariants</code><span class="sig-paren">(</span><em>prices</em>, <em>no_assets</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.invariants.stock_invariants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates stock price invariants, which are the compounded returns
+:param prices: stock prices data of the various tickers
+:type prices: pd Dataframe
+:param no_assets: number of assets in data
+:type no_assets: int
+:return: dataframe of stock invariants
+:rtype: pd.Dataframe</p>
+<p>This function, given the stock prices, calculates the invariants, which
+are the compound returns of stocks:</p>
+<div class="math notranslate nohighlight">
+\[I=\ln(P_{i})-\ln(P_{i-1})\]</div>
+<p>A lot of study has shown that with the right distribution and estimators,
+compounded returns are an effective market invariant for stocks.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="portfolioopt.invariants.forex_invariants">
+<code class="descclassname">portfolioopt.invariants.</code><code class="descname">forex_invariants</code><span class="sig-paren">(</span><em>prices</em>, <em>no_assets</em><span class="sig-paren">)</span><a class="headerlink" href="#portfolioopt.invariants.forex_invariants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates forex price invariants, which are the compounded returns
+:param prices: stock prices data of the various tickers
+:type prices: pd Dataframe
+:param no_assets: number of assets in data
+:type no_assets: int
+:return: dataframe of stock invariants
+:rtype: pd.Dataframe</p>
+<p>This function, given the forex prices, calculates the invariants, which are
+the compound returns.</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[I=\ln(P_{i})-\ln(P_{i-1})\]</div>
+<p>A lot of study has shown that with the right distribution and estimators,
+compounded returns are an effective market invariant for stocks.</p>
+</div></blockquote>
+</dd></dl>
+
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This module is being extended to incorporate derivatives and bonds.</p>
+</div>
 </div>
 
 
