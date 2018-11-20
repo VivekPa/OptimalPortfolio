@@ -12,6 +12,7 @@ Portfolio Optimisation has the following pipeline:
 
 This can be achieved by the following code template:
 
+
 .. code-block:: python
   import pandas as pd
   import portfolioopt.invariants as inv
@@ -31,5 +32,6 @@ This can be achieved by the following code template:
   frontier = fron.EfficientFrontier(20, mu, cov, list(df.columns), gamma=0)
   print(frontier.maximise_sharpe())
   frontier.portfolio_performance(verbose=True)
+
 
 It is that simple. 
