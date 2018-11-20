@@ -81,16 +81,54 @@ class EfficientFrontier:
         self.skew = None
         self.kurt = None
 
-    def _make_valid_bounds(self, test_bounds):
+    def moment_optimisation(self, skew, kurt, delta1, delta2, delta3, delta4, gamma=0.2):
         """
-        Private method: process input bounds into a form acceptable by scipy.optimize,
-        and check the validity of said bounds.
+        Calculates the optimal portfolio weights for utility functions that uses mean, covariance, skew and kurtosis of
+        market invariants.
+
+        :param skew: skew of market invariants
+        :param kurt: kurtosis of market invariants
+        :param delta1: coefficient of mean, (i.e how much weight to give maximising mean)
+        :param delta2: coefficient of covariance, (i.e how much weight to give minimising covariance)
+        :param delta3: coefficient of skew, (i.e how much weight to give maximising skew)
+        :param delta4: coefficient of kurtosis, (i.e how much weight to give minimising kurtosis)
+        :param gamma: coefficient of L2 Regularisation (default set to 0.2)
+        :return: dictionary of tickers and weights
+        """
+        self.skew = skew
+        self.kurt = kurt
+        args = (self.mean, self.cov, skew, kurt, delta1, delta2, delta3, delta4, gamma)
+        result = scop.minimize(
+            utility_functions.moment_utility,
+            x0=self.initial_guess,
+            args=args,
+            method="SLSQP",
+            bounds=self.weight_bounds,
+            constraints=self.constraints)
+        self.weights = result["x"]
+        return dict(zip(self.tickers, self.weights))
+
+    def kelly_criterion(self, risk_free_rate=0.02):
+        """
+        Calculates the optimal portfolio weights according to Kelly's Criterion.
+
+        :param risk_free_rate: risk free rate of return
+        :type: float
+        :return: dictionary of tickers + weights
+        :rtype: dict
+        """
+        weights = (1+risk_free_rate)*(np.dot(np.invert(self.cov), (self.mean-risk_free_rate)))
+        return dict(zip(self.tickers, weights))
+        
+    def _create_bounds(self, test_bounds):
+        """
+        Private method: make sure bounds are valid and formats them
 
         :param test_bounds: minimum and maximum weight of an asset
         :type test_bounds: tuple
         :raises ValueError: if ``test_bounds`` is not a tuple of length two.
         :raises ValueError: if the lower bound is too high
-        :return: a tuple of bounds, e.g ((0, 1), (0, 1), (0, 1) ...)
+        :return: a tuple of bounds
         :rtype: tuple of tuples
         """
         if len(test_bounds) != 2 or not isinstance(test_bounds, tuple):
@@ -102,15 +140,12 @@ class EfficientFrontier:
                 raise ValueError("Lower bound is too high")
         return (test_bounds,) * self.n
 
-    def max_sharpe(self, risk_free_rate=0.02):
+    def maxmise_sharpe(self, risk_free_rate=0.02):
         """
-        Maximise the Sharpe Ratio. The result is also referred to as the tangency portfolio,
-        as it is the tangent to the efficient frontier curve that intercepts the risk-free
-        rate.
+        Maximise the Sharpe Ratio. Maximises the risk adjusted excess return of the portfolio.
 
-        :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02
+        :param risk_free_rate: risk-free rate of return, defaults to 0.02
         :type risk_free_rate: float, optional
-        :raises ValueError: if ``risk_free_rate`` is non-numeric
         :return: asset weights for the Sharpe-maximising portfolio
         :rtype: dict
         """
@@ -129,11 +164,11 @@ class EfficientFrontier:
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
-    def min_volatility(self):
+    def min_vol(self):
         """
         Minimise volatility.
 
-        :return: asset weights for the volatility-minimising portfolio
+        :return: asset weights for the portfolio that minismises volatility
         :rtype: dict
         """
         args = (self.cov, self.gamma)
@@ -167,9 +202,9 @@ class EfficientFrontier:
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
-    def efficient_risk(self, target_risk, risk_free_rate=0.02, market_neutral=False):
+    def eff_risk(self, target_risk, risk_free_rate=0.02, market_neutral=False):
         """
-        Calculate the Sharpe-maximising portfolio for a given volatility (i.e max return
+        Calculate the maximum Sharpe ratio portfolio for a given volatility (i.e max return
         for a target risk).
 
         :param target_risk: the desired volatility of the resulting portfolio.
@@ -219,9 +254,9 @@ class EfficientFrontier:
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
-    def efficient_return(self, target_return, market_neutral=False):
+    def eff_return(self, target_return, market_neutral=False):
         """
-        Calculate the 'Markowitz portfolio', minimising volatility for a given target return.
+        Calculate the portfolio that minimises volatility for a given target return.
 
         :param target_return: the desired return of the resulting portfolio.
         :type target_return: float
@@ -229,7 +264,7 @@ class EfficientFrontier:
                                defaults to False. Requires negative lower weight bound.
         :type market_neutral: bool, optional
         :raises ValueError: if ``target_return`` is not a positive float
-        :return: asset weights for the Markowitz portfolio
+        :return: asset weights for portfolio
         :rtype: dict
         """
         if not isinstance(target_return, float) or target_return < 0:
@@ -265,44 +300,6 @@ class EfficientFrontier:
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
-    def moment_optimisation(self, skew, kurt, delta1, delta2, delta3, delta4, gamma=0.2):
-        """
-        Calculates the optimal portfolio weights for utility functions that uses mean, covariance, skew and kurtosis of
-        market invariants.
-
-        :param skew: skew of market invariants
-        :param kurt: kurtosis of market invariants
-        :param delta1: coefficient of mean, (i.e how much weight to give maximising mean)
-        :param delta2: coefficient of covariance, (i.e how much weight to give minimising covariance)
-        :param delta3: coefficient of skew, (i.e how much weight to give maximising skew)
-        :param delta4: coefficient of kurtosis, (i.e how much weight to give minimising kurtosis)
-        :param gamma: coefficient of L2 Regularisation (default set to 0.2)
-        :return: dictionary of tickers and weights
-        """
-        self.skew = skew
-        self.kurt = kurt
-        args = (self.mean, self.cov, skew, kurt, delta1, delta2, delta3, delta4, gamma)
-        result = scop.minimize(
-            utility_functions.moment_utility,
-            x0=self.initial_guess,
-            args=args,
-            method="SLSQP",
-            bounds=self.weight_bounds,
-            constraints=self.constraints)
-        self.weights = result["x"]
-        return dict(zip(self.tickers, self.weights))
-
-    def kelly_criterion(self, risk_free_rate=0.02):
-        """
-        Calculates the optimal portfolio weights according to Kelly's Criterion.
-
-        :param risk_free_rate: risk free rate of return
-        :type: float
-        :return: dictionary of tickers + weights
-        :rtype: dict
-        """
-        weights = (1+risk_free_rate)*(np.dot(np.invert(self.cov), (self.mean-risk_free_rate)))
-        return dict(zip(self.tickers, weights))
 
     def portfolio_performance(self, verbose=False, risk_free_rate=0.02):
         """
