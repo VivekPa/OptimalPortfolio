@@ -38,10 +38,7 @@ Contents
    MarketInvariants
    MomentEstimation
    EfficientFrontier
-   OtherOptimisation
-   PostProcessing
    Roadmap
-   Contributing
    About
 
 
