@@ -1,5 +1,5 @@
  .. image:: ../media/logo_v2.png
-    :scale: 40 %
+    :scale: 30 %
     :align: center
 
  .. raw:: html
