@@ -258,11 +258,10 @@ class Shrinkage:
         assets = self.invariants.columns
         return pd.DataFrame(raw_cov, index=assets, columns=assets) * self.frequency
 
-    def shrunk_covariance(self, delta=0.2):
+    def cov_shrink(self, delta=0.2):
         """
-        Shrink a sample covariance matrix to the identity matrix (scaled by the average
-        sample variance). This method does not estimate an optimal shrinkage parameter,
-        it requires manual input.
+        The sample covariance matrix is shrunk to the itendity matrix 
+        using a manual shrinkage coefficient.
 
         :param delta: shrinkage parameter, defaults to 0.2.
         :type delta: float, optional
@@ -289,7 +288,7 @@ class Shrinkage:
         shrunk_cov, self.delta = covariance.ledoit_wolf(X)
         return self._format_cov(shrunk_cov)
 
-    def oracle_approximation(self):
+    def oracle_approx(self):
         """
         Calculates the Oracle Approximating Shrinkage estimate
 
