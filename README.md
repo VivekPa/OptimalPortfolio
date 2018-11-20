@@ -54,7 +54,7 @@ import portfolioopt.moment_est as mest
 import portfolioopt.eff_frontier as fron
 
 # Load stock prices
-df = pd.read_csv("stock_prices.csv", parse_dates=True, index_col="date")
+df = pd.read_csv("stock_data.csv", parse_dates=True, index_col="date")
 
 # Calculate invariants and estimate mean and covariance
 invariants = inv.stock_invariants(df, 20)
@@ -63,7 +63,7 @@ cov = mest.sample_cov(invariants)
 
 # Optimise using the Sharpe Ratio
 frontier = fron.EfficientFrontier(20, mu, cov, list(df.columns), gamma=0)
-print(frontier.max_sharpe())
+print(frontier.maximise_sharpe())
 frontier.portfolio_performance(verbose=True)
 ```
 
