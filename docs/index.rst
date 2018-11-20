@@ -25,8 +25,6 @@ This library is easily accessible and highly developable. Optimal for both
 algorithmic traders and fundamental investors to improve their returns in an
 risk free way.
 
-Installation
-==============================================
 
 
 Contents
@@ -43,8 +41,7 @@ Contents
 
 
 
-Indices and tables
-==================
+
 
 * :ref:`genindex`
 * :ref:`modindex`
