@@ -1,5 +1,5 @@
 """
-This ``eff_frontier`` module calculates the optimal portfolio weights given the mean, covariance, skew and kurtosis of
+This ``opt_allocations`` module calculates the optimal portfolio weights given the mean, covariance, skew and kurtosis of
 the data, for various utility functions. Currently implemented:
 
 - Maximum Sharpe Ratio
@@ -18,9 +18,9 @@ import warnings
 import portfolioopt.utility_functions as utility_functions
 
 
-class EfficientFrontier:
+class OptimalAllocations:
     """
-    This ``EfficientFrontier`` class optimises portfolio weights for given utility function.
+    This ``OptimalAllocations`` class optimises portfolio weights for given utility function.
 
     Instance variables:
 
