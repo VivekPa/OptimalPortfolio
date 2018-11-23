@@ -45,7 +45,7 @@ class OptimalAllocations:
         - ``portfolio_performance()`` (calculates portfolio performance and optionally prints it)
 
     """
-    def __init__(self, n, mean, cov, tickers, gamma, weight_bounds=(0, 1)):
+    def __init__(self, n, mean, cov, tickers, weight_bounds=(0, 1)):
         """
 
         :param n: number of assets
@@ -56,8 +56,6 @@ class OptimalAllocations:
         :type cov: pd.Dataframe
         :param tickers: tickers of securities used
         :type tickers: list
-        :param gamma: L2 regularisation coefficient
-        :type gamma: float
         :param weight_bounds: bounds for portfolio weights. Change to (-1,1) for shorting
         :type weight_bounds: tuple
         """
@@ -67,7 +65,6 @@ class OptimalAllocations:
         self.weight_bounds = weight_bounds
         self.initial_guess = np.array([1 / self.n] * self.n)
         self.constraints = [{"type": "eq", "fun": lambda x: np.sum(x) - 1}] # set constraint to 0 if market neutral
-        self.gamma = gamma
         self.tickers = tickers
         self.weights = None
         self.skew = None
@@ -125,8 +122,8 @@ class OptimalAllocations:
         if not isinstance(risk_free_rate, (int, float)):
             raise ValueError("risk_free_rate should be numeric")
 
-        args = (self.mean, self.cov,
-                self.gamma, risk_free_rate)
+        args = (self.mean, self.cov
+, risk_free_rate)
         result = scop.minimize(
             utility_functions.sharpe,
             x0=self.initial_guess,
