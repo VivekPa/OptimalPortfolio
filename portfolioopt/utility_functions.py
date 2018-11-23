@@ -11,7 +11,7 @@ Currently implemented:
 import numpy as np
 
 
-def mean_return(weights, expected_returns):
+def mean_return(weights, mean):
     """
     Calculate the negative mean return of a portfolio
     :param weights: asset weights of the portfolio
@@ -21,18 +21,16 @@ def mean_return(weights, expected_returns):
     :return: negative mean return
     :rtype: float
     """
-    return -weights.dot(expected_returns)
+    return -weights.dot(mean)
 
 
-def sharpe(weights, expected_returns, cov_matrix, risk_free_rate=0.02):
+def sharpe(weights, mean, cov, risk_free_rate=0.02):
     """
     Calculate the negative Sharpe ratio of a portfolio
     :param weights: asset weights of the portfolio
     :type weights: np.ndarray
-    :param expected_returns: expected return of each asset
-    :type expected_returns: pd.Series
-    :param cov_matrix: the covariance matrix of asset returns
-    :type cov_matrix: pd.DataFrame
+    :param mean: mean of market invariants
+    :param cov: the covariance matrix of invariants
     :param risk_free_rate: risk-free rate of return, defaults to 0.02
     :type risk_free_rate: float, optional
     :return: negative Sharpe ratio
@@ -43,13 +41,11 @@ def sharpe(weights, expected_returns, cov_matrix, risk_free_rate=0.02):
     return -(mu - risk_free_rate) / sigma
 
 
-def volatility(weights, cov_matrix):
+def volatility(weights, cov):
     """
     Calculate the volatility of a portfolio.
     :param weights: asset weights of the portfolio
-    :type weights: np.ndarray
-    :param cov_matrix: the covariance matrix of asset returns
-    :type cov_matrix: pd.DataFrame
+    :param cov: the covariance of invariants
     :return: portfolio variance
     :rtype: float
     """
