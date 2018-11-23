@@ -11,7 +11,7 @@ Currently implemented:
 import numpy as np
 
 
-def mean_return(weights, mean):
+def mean(weights, mean):
     """
     Calculate the negative mean return of a portfolio
     :param weights: asset weights of the portfolio
