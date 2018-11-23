@@ -28,41 +28,7 @@ from sklearn import covariance
 from sklearn.covariance.shrunk_covariance_ import ledoit_wolf_shrinkage
 from scipy.stats import moment
 import warnings
-
-
-def sample_mean(invariants, frequency=252):
-    """
-    Calculates sample mean.
-
-    :param invariants: sample data of market invariants
-    :type invariants: pd.Dataframe
-    :param frequency: time horizon of projection, default set to 252 days
-    :type frequency: int
-    :return: sample mean dataframe
-    :rtype: pd.Dataframe
-    """
-    if not isinstance(invariants, pd.DataFrame):
-        warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
-        invariants = pd.DataFrame(invariants)
-    daily_mean = invariants.mean()
-    return daily_mean*np.sqrt(frequency)
-
-
-def sample_cov(invariants, frequency=252):
-    """
-    Calculates sample covariance
-
-    :param invariants: sample data of market invariants
-    :type invariants: pd.Dataframe
-    :param frequency: time horizon of projection, default set to 252 days
-    :type frequency: int
-    :return: sample covariance dataframe
-    """
-    if not isinstance(invariants, pd.DataFrame):
-        warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
-        invariants = pd.DataFrame(invariants)
-    daily_cov = invariants.cov()
-    return daily_cov*frequency
+from portfolioopt.exp_max import expectation_max
 
 
 def sample_skew(invariants, frequency=252):
@@ -160,6 +126,7 @@ class MLE:
     implemented distributions:
 
     - Normal
+    - Student-t
 
     Instance variables:
 
@@ -174,6 +141,7 @@ class MLE:
     Public methods:
 
     - ``norm_est`` (calculates the normally distributed maximum likelihood estimate of mean, covariance, skew and kurtosis)
+    - ``st_est`` (calculates the student-t distributed maximum likelihood estimate of mean, covariance, skew and kurtosis)
     """
     def __init__(self, invariants, n, dist="normal"):
         """
@@ -196,7 +164,7 @@ class MLE:
     def norm_est(self):
         """
         Calculates MLE estimate of mean, covariance, skew and kurtosis, assuming normal distribution
-        
+
         :return: dataframes of mean, covariance, skew and kurtosis
         :rtype: pd.Dataframe
         """
@@ -206,6 +174,18 @@ class MLE:
             self.skew = 0
             self.kurt = 0
         return self.mean, self.cov, self.skew, self.kurt
+
+    def st_est(self):
+        """
+        Calculates MLE estimate of mean, covariance, skew and kurtosis, assuming student-t distribution
+
+        :return: dataframe of mean, covariance, skew and kurtosis
+        :rtype: pd.Dataframe
+        """
+        if self.dist == "student-t":
+            self.mean, self.cov = expectation_max(self.invariants, max_iter=1000)
+            self.skew = 0
+            self.kurt = 6
 
 
 class Shrinkage:
@@ -221,10 +201,6 @@ class Shrinkage:
 
     Public methods:
 
-    - ``shrunk_covariance`` (calculates manually shrunk covariance matrix)
-    - ``ledoit_wolf`` (calculates optimal shrinkage using Ledoit-Wolf method)
-    - ``oracle_approximate`` (calculates optimal shrinkage using Oracle approximation)
-    - ``exp_ledoit`` (calculates optimal shrinkage of exponentially weighted covariance using Ledoit-Wolf method)
     - ``param_mle`` (calculates manually shrunk covariance using nonparametric and maximum likelihood estimate of covariance matrix)
 
     """
@@ -257,47 +233,6 @@ class Shrinkage:
         """
         assets = self.invariants.columns
         return pd.DataFrame(raw_cov, index=assets, columns=assets) * self.frequency
-
-    def cov_shrink(self, delta=0.2):
-        """
-        The sample covariance matrix is shrunk to the itendity matrix 
-        using a manual shrinkage coefficient.
-
-        :param delta: shrinkage parameter, defaults to 0.2.
-        :type delta: float, optional
-        :return: shrunk sample covariance matrix
-        :rtype: pd.Dataframe
-        """
-        self.delta = delta
-        N = self.S.shape[1]
-        # Shrinkage target
-        mu = np.trace(self.S) / N
-        F = np.identity(N) * mu
-        # Shrinkage
-        shrunk_cov = delta * F + (1 - delta) * self.S
-        return self._format_cov(shrunk_cov)
-
-    def ledoit_wolf(self):
-        """
-        Calculates the Ledoit-Wolf shrinkage estimate.
-
-        :return: shrunk sample covariance matrix
-        :rtype: pd.Dataframe
-        """
-        X = np.nan_to_num(self.invariants.values)
-        shrunk_cov, self.delta = covariance.ledoit_wolf(X)
-        return self._format_cov(shrunk_cov)
-
-    def oracle_approx(self):
-        """
-        Calculates the Oracle Approximating Shrinkage estimate
-
-        :return: shrunk sample covariance matrix
-        :rtype: pd.Dataframe
-        """
-        X = np.nan_to_num(self.invariants.values)
-        shrunk_cov, self.delta = covariance.oas(X)
-        return self._format_cov(shrunk_cov)
 
     def exp_ledoit(self, block_size=1000):
         """
