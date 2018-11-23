@@ -1,5 +1,5 @@
 """
-This ``eff_frontier`` module calculates the optimal portfolio weights given the mean, covariance, skew and kurtosis of
+This ``opt_allocations`` module calculates the optimal portfolio weights given the mean, covariance, skew and kurtosis of
 the data, for various utility functions. Currently implemented:
 
 - Moment Optimisation
@@ -62,26 +62,13 @@ class OptimalAllocations:
         self.n = n
         self.mean = mean
         self.cov = cov
-        self.weight_bounds = weight_bounds
-        self.initial_guess = np.array([1 / self.n] * self.n)
+        self.weight_bounds = (weight_bounds,)*self.n
+        self.x0 = np.array([1 / self.n] * self.n)
         self.constraints = [{"type": "eq", "fun": lambda x: np.sum(x) - 1}] # set constraint to 0 if market neutral
         self.tickers = tickers
         self.weights = None
         self.skew = None
         self.kurt = None
-
-    def _bounds(self, bounds):
-        """
-        Private method: processes input bounds for scipy.optimize.
-
-        :param bounds: minimum and maximum weight of an asset
-        :type bounds: tuple
-        :return: a tuple of bounds, e.g ((0, 1), (0, 1), (0, 1) ...)
-        :rtype: tuple of tuples
-        """
-        if len(bounds) != 2 or not isinstance(bounds, tuple):
-            raise ValueError("bounds must be a tuple of (lower bound, upper bound)")
-        return (bounds,) * self.n
 
     def moment_optimisation(self, skew, kurt, delta1, delta2, delta3, delta4):
         """
@@ -101,10 +88,10 @@ class OptimalAllocations:
         args = (self.mean, self.cov, skew, kurt, delta1, delta2, delta3, delta4)
         result = scop.minimize(
             utility_functions.moment_utility,
-            x0=self.initial_guess,
+            x0=self.x0,
             args=args,
             method="SLSQP",
-            bounds=self._bounds(self.weight_bounds),
+            bounds=self.weight_bounds,
             constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
@@ -119,22 +106,18 @@ class OptimalAllocations:
         :return: asset weights for the Sharpe-maximising portfolio
         :rtype: dict
         """
-        if not isinstance(risk_free_rate, (int, float)):
-            raise ValueError("risk_free_rate should be numeric")
-
-        args = (self.mean, self.cov
-, risk_free_rate)
+        args = (self.mean, self.cov, risk_free_rate)
         result = scop.minimize(
             utility_functions.sharpe,
-            x0=self.initial_guess,
+            x0=self.x0,
             args=args,
             method="SLSQP",
-            bounds=self._bounds(self.weight_bounds),
+            bounds=self.weight_bounds,
             constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
-    def portfolio_performance(self, verbose=False, risk_free_rate=0.02):
+    def portfolio_metrics(self, verbose=False, risk_free_rate=0.02):
         """
         After optimising, calculate (and optionally print) the return, volatility and Sharpe Ratio of the portfolio.
 
@@ -145,17 +128,13 @@ class OptimalAllocations:
         :return: expected return, volatility, Sharpe ratio.
         :rtype: (float, float, float)
         """
-        if self.weights is None:
-            raise ValueError("Weights not calculated yet")
         sigma = np.sqrt(utility_functions.volatility(
             self.weights, self.cov))
         mu = self.weights.dot(self.mean)
 
-        sharpe = -utility_functions.sharpe(
-            self.weights, self.mean, self.cov, risk_free_rate
-        )
+        sharpe = -utility_functions.sharpe(self.weights, self.mean, self.cov, risk_free_rate)
         if verbose:
-            print("Expected annual return: {:.1f}%".format(100 * mu))
-            print("Annual volatility: {:.1f}%".format(100 * sigma))
-            print("Sharpe Ratio: {:.2f}".format(sharpe))
+            print(f"Expected annual return: {100*mu}")
+            print(f"Annual volatility: {100*sigma}")
+            print(f"Sharpe Ratio: {sharpe}")
         return mu, sigma, sharpe
