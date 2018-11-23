@@ -60,7 +60,7 @@ class OptimalAllocations:
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
-    def max_sharpe(self, risk_free_rate=0.02):
+    def sharpe_opt(self, risk_free_rate=0.02):
         """
         Maximise the Sharpe Ratio.
 
