@@ -1,4 +1,4 @@
-<p align="center">
+<p align="left">
     <a href="https://www.python.org/">
         <img src="https://ForTheBadge.com/images/badges/made-with-python.svg"
             alt="python"></a> &nbsp;
@@ -17,7 +17,6 @@ Regardless of whether you are a fundamental investor, or an algorithmic trader, 
 ## Contents
 - [Contents](#contents)
 - [Overview](#overview)
-- [Getting Started](#getting-started)
 - [Market Invariants](#market-invariants)
 - [Moment Estimation](#moment-estimation)
     - [Nonparametric Estimators](#nonparametric-estimators)
