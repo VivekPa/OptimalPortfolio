@@ -24,7 +24,7 @@ def mean_return(weights, expected_returns):
     return -weights.dot(expected_returns)
 
 
-def sharpe(weights, expected_returns, cov_matrix, gamma=0, risk_free_rate=0.02):
+def sharpe(weights, expected_returns, cov_matrix, risk_free_rate=0.02):
     """
     Calculate the negative Sharpe ratio of a portfolio
     :param weights: asset weights of the portfolio
@@ -33,39 +33,31 @@ def sharpe(weights, expected_returns, cov_matrix, gamma=0, risk_free_rate=0.02):
     :type expected_returns: pd.Series
     :param cov_matrix: the covariance matrix of asset returns
     :type cov_matrix: pd.DataFrame
-    :param gamma: L2 regularisation parameter, defaults to 0. Increase if you want more
-                    non-negligible weights
-    :type gamma: float, optional
-    :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02
+    :param risk_free_rate: risk-free rate of return, defaults to 0.02
     :type risk_free_rate: float, optional
     :return: negative Sharpe ratio
     :rtype: float
     """
     mu = weights.dot(expected_returns)
     sigma = np.sqrt(np.dot(weights, np.dot(cov_matrix, weights.T)))
-    L2_reg = gamma * (weights ** 2).sum()
-    return -(mu - risk_free_rate) / sigma + L2_reg
+    return -(mu - risk_free_rate) / sigma
 
 
-def volatility(weights, cov_matrix, gamma=0):
+def volatility(weights, cov_matrix):
     """
     Calculate the volatility of a portfolio.
     :param weights: asset weights of the portfolio
     :type weights: np.ndarray
     :param cov_matrix: the covariance matrix of asset returns
     :type cov_matrix: pd.DataFrame
-    :param gamma: L2 regularisation parameter, defaults to 0. Increase if you want more
-                  non-negligible weights
-    :type gamma: float, optional
     :return: portfolio variance
     :rtype: float
     """
-    L2_reg = gamma * (weights ** 2).sum()
     portfolio_volatility = np.dot(weights.T, np.dot(cov_matrix, weights))
-    return portfolio_volatility + L2_reg
+    return portfolio_volatility
 
 
-def moment_utility(weights, mean, cov, skew, kurt, delta1, delta2, delta3, delta4, gamma):
+def moment_utility(weights, mean, cov, skew, kurt, delta1, delta2, delta3, delta4):
     """
     Calculates the utility using mean, covariance, skew and kurtosis of data.
     :param weights: portfolio weights
@@ -77,14 +69,12 @@ def moment_utility(weights, mean, cov, skew, kurt, delta1, delta2, delta3, delta
     :param delta2: coefficient of covariance
     :param delta3: coefficient of skew
     :param delta4: coefficient of kurtosis
-    :param gamma: coefficient of L2 regularisation
     :return: portfolio utility
     """
-    L2_reg = gamma * (weights ** 2).sum()
     utility = delta1 * (np.dot(np.transpose(weights), mean)) - \
               delta2 * (np.dot(np.dot(np.transpose(weights), cov), weights)) + \
               delta3 * (np.dot(np.dot(np.transpose(weights), skew), weights)) - \
-              delta4 * (np.dot(np.dot(np.transpose(weights), kurt), weights)) + L2_reg
+              delta4 * (np.dot(np.dot(np.transpose(weights), kurt), weights))
     return -utility
 
 
