@@ -15,39 +15,8 @@ import portfolioopt.utility_functions as utility_functions
 
 
 class OptimalAllocations:
-    """
-    This ``OptimalAllocations`` class optimises portfolio weights for given utility function.
-
-    Instance variables:
-
-    - Inputs:
-
-        - ``n`` (number of assets)
-        - ``mean`` (mean of market invariants)
-        - ``cov`` (covariance of market invariants)
-        - ``weight_bounds`` (the bounds of portfolio weights)
-        - ``tickers`` (list of tickers of assets)
-
-    - Optimisation parameters:
-
-        - ``initial_guess`` (initial guess for portfolio weights, set to evenly distributed)
-        - ``constraints`` (constraints for optimisation)
-
-    - Outputs:
-
-        - ``weights`` (portfolio weights, initially set to None)
-
-
-    Public methods:
-
-        - ``moment_optimisation`` (calculates portfolio weights that maximises utility function of higher moments)
-        - ``max_sharpe()`` (calculates portfolio weights that maximises Sharpe Ratio)
-        - ``portfolio_performance()`` (calculates portfolio performance and optionally prints it)
-
-    """
     def __init__(self, n, mean, cov, tickers, weight_bounds=(0, 1)):
         """
-
         :param n: number of assets
         :type n: int
         :param mean: mean estimate of market invariants
@@ -56,7 +25,7 @@ class OptimalAllocations:
         :type cov: pd.Dataframe
         :param tickers: tickers of securities used
         :type tickers: list
-        :param weight_bounds: bounds for portfolio weights. Change to (-1,1) for shorting
+        :param weight_bounds: bounds for portfolio weights.
         :type weight_bounds: tuple
         """
         self.n = n
@@ -86,13 +55,8 @@ class OptimalAllocations:
         self.skew = skew
         self.kurt = kurt
         args = (self.mean, self.cov, skew, kurt, delta1, delta2, delta3, delta4)
-        result = scop.minimize(
-            utility_functions.moment_utility,
-            x0=self.x0,
-            args=args,
-            method="SLSQP",
-            bounds=self.weight_bounds,
-            constraints=self.constraints)
+        result = scop.minimize(utility_functions.moment_utility, x0=self.x0, args=args, 
+                               method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
@@ -107,13 +71,8 @@ class OptimalAllocations:
         :rtype: dict
         """
         args = (self.mean, self.cov, risk_free_rate)
-        result = scop.minimize(
-            utility_functions.sharpe,
-            x0=self.x0,
-            args=args,
-            method="SLSQP",
-            bounds=self.weight_bounds,
-            constraints=self.constraints)
+        result = scop.minimize(utility_functions.sharpe, x0=self.x0, args=args, 
+                               method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
 
