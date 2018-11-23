@@ -74,7 +74,7 @@ def moment_utility(weights, mean, cov, skew, kurt, delta1, delta2, delta3, delta
     utility = delta1 * (np.dot(np.transpose(weights), mean)) - \
               delta2 * (np.dot(np.dot(np.transpose(weights), cov), weights)) + \
               delta3 * (np.dot(np.dot(np.transpose(weights), skew), weights)) - \
-              delta4 * (np.dot(np.dot(np.transpose(weights), kurt), weights)) + L2_reg
+              delta4 * (np.dot(np.dot(np.transpose(weights), kurt), weights))
     return -utility
 
 
