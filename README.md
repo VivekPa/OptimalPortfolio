@@ -1,3 +1,5 @@
+# Optimal Portfolio
+
 <p align="left">
     <a href="https://www.python.org/">
         <img src="https://ForTheBadge.com/images/badges/made-with-python.svg"
@@ -35,7 +37,7 @@ run setup.py
 
 
 ## Market Invariants
-The first step to optimising any portfolio is calculating market invariants. Market invariants are defined as aspects of market prices that have some determinable statistical behaviour over time. For stock prices, the compounded returns are the market invariants. So when we calculate these invariants, we can statistically model them and gain useful insight into their behaviour. So far, calculating market invariants of stock prices and forex prices have been implemented. 
+The first step to optimising any portfolio is calculating market invariants. Market invariants are defined as aspects of market prices that have some determinable statistical behaviour over time. For stock prices, the compounded returns are the market invariants. So when we calculate these invariants, we can statistically model them and gain useful insight into their behaviour. So far, calculating market invariants of stock prices and forex prices have been implemented. I plan to calculate invariants for options and bonds but data acquisition is difficult. 
 
 ## Moment Estimation
 Once the market invariants have been calculated, it is time to model the statistical properties of the invariants. This is an actively researched and studied field and due to the nature of the complexity involved in modelling the statistical properties of large market data, there are several limitations in estimating the moments of the distributions. I have tried implementing cutting edge research in shrinkage estimators. 
@@ -50,9 +52,7 @@ Maximum likelihood estimators (MLE) are intended to maximise the probability tha
 - Multivariate Student t 
 
 ### Shrinkage Estimators
-Both nonparametric and MLE estimators require a large set of data and even then they might not produce the best estimators due to their inherent bias or lack there off. Akin to the bias-variance tradeoff in machine learning, too much bias and too much variance is not good in estimators. So, as a way to combine the two estimators, shrinkage was introduced. The idea is that you combine two weak estimators, one with high variance and the other with high bias, with some coefficient called the shrinkage coefficient, to produce a much better estimator. This is one of the cutting edge estimators and is still rigorously being researched. The following have been implemented:
-
-- Nonparametric and MLE manual shrinkage
+Both nonparametric and MLE estimators require a large set of data and even then they might not produce the best estimators due to their inherent bias or lack there off. Akin to the bias-variance tradeoff in machine learning, too much bias and too much variance is not good in estimators. So, as a way to combine the two estimators, shrinkage was introduced. The idea is that you combine two weak estimators, one with high variance and the other with high bias, with some coefficient called the shrinkage coefficient, to produce a much better estimator. This is one of the cutting edge estimators and is still rigorously being researched. I have implemented shrinkage of nonparametric (exponential) estimates with MLE (student-t) estimates, with manual shrinkage. Working on finding the optimal shrinkage coefficient. 
 
 ## Optimal Allocations
 Classical asset allocation is the efficient frontier allocation. This is also known as the mean-variance optimisation as it takes into account the estimators of the mean and variance. The procedure of optimisation involves choosing an utility function and optimising it for portfolio weights. However, it struggles to capture the fat tail behaviour and skewness of the market prices. 
