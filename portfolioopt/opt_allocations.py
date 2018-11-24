@@ -9,7 +9,7 @@ the data, for various utility functions. Currently implemented:
 
 import numpy as np
 import pandas as pd
-import scipy.optimize as scop
+from scipy.optimize import minimize
 import warnings
 import portfolioopt.utility_functions as utility_functions
 
@@ -55,7 +55,7 @@ class OptimalAllocations:
         self.skew = skew
         self.kurt = kurt
         args = (self.mean, self.cov, skew, kurt, delta1, delta2, delta3, delta4)
-        result = scop.minimize(utility_functions.moment_utility, x0=self.x0, args=args, 
+        result = minimize(utility_functions.moment_utility, x0=self.x0, args=args,
                                method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
@@ -71,7 +71,7 @@ class OptimalAllocations:
         :rtype: dict
         """
         args = (self.mean, self.cov, risk_free_rate)
-        result = scop.minimize(utility_functions.sharpe, x0=self.x0, args=args, 
+        result = minimize(utility_functions.sharpe, x0=self.x0, args=args,
                                method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
@@ -80,8 +80,6 @@ class OptimalAllocations:
         """
         After optimising, calculate (and optionally print) the return, volatility and Sharpe Ratio of the portfolio.
 
-        :param verbose: whether performance should be printed, defaults to False
-        :type verbose: bool, optional
         :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02
         :type risk_free_rate: float, optional
         :return: expected return, volatility, Sharpe ratio.
@@ -92,8 +90,7 @@ class OptimalAllocations:
         mu = self.weights.dot(self.mean)
 
         sharpe = -utility_functions.sharpe(self.weights, self.mean, self.cov, risk_free_rate)
-        if verbose:
-            print(f"Expected annual return: {100*mu}")
-            print(f"Annual volatility: {100*sigma}")
-            print(f"Sharpe Ratio: {sharpe}")
+        print(f"Expected annual return: {100*mu}")
+        print(f"Annual volatility: {100*sigma}")
+        print(f"Sharpe Ratio: {sharpe}")
         return mu, sigma, sharpe
