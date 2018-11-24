@@ -33,7 +33,7 @@ class OptimalAllocations:
         self.cov = cov
         self.weight_bounds = (weight_bounds,)*self.n
         self.x0 = np.array([1 / self.n] * self.n)
-        self.constraints = [{"type": "eq", "fun": lambda x: np.sum(x) - 1}] # set constraint to 0 if market neutral
+        self.constraints = [{"type": "eq", "fun": lambda x: np.sum(x) - 1}]
         self.tickers = tickers
         self.weights = None
         self.skew = None
