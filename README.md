@@ -46,7 +46,7 @@ Once the market invariants have been calculated, it is time to model the statist
 The simplest method of estimating the mean and covariance of invariants are the sample mean and covariance. However, this can be extended by introducing weightage for the timestamps, i.e giving more weight to recent data than older data. One interesting approach I have taken is introducing exponentially weighted mean and covariance, which I read about [here](https://reasonabledeviations.science/2018/08/15/exponential-covariance/). I am now working on implementing exponential weightage for skew and kurtosis.
 
 ### Maximum Likelihood Estimators
-Maximum likelihood estimators (MLE) are intended to maximise the probability that the data points occur within a prescribed distribution. The procedure hence involves choosing a distribution or a class of distributions and then fitting the data to the distritbution such that the log probability of the data points are maximised by the parameters of the distributions. This will in turn give us the optimal estimators of the distribution for market invariants. MLE has been implemented for the following distributions:
+Maximum likelihood estimators (MLE) are intended to maximise the probability that the data points occur within a prescribed distribution. The procedure hence involves choosing a distribution or a class of distributions and then fitting the data to the distribution such that the log probability of the data points are maximised by the parameters of the distributions. This will in turn give us the optimal estimators of the distribution for market invariants. MLE has been implemented for the following distributions:
 
 - Multivariate Normal
 - Multivariate Student t
