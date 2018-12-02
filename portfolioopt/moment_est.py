@@ -98,7 +98,7 @@ def exp_mean(invariants, span=180, frequency=252):
         warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
         invariants = pd.DataFrame(invariants)
     daily_mean = invariants.ewm(span=span).mean()
-    return daily_mean*np.sqrt(frequency)
+    return daily_mean*frequency
 
 
 def exp_cov(invariants, span=180, frequency=252):
