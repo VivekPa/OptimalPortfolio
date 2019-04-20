@@ -9,7 +9,7 @@ setup(
     author='Vivek Palaniappan and Sven Serneels',
     author_email='vivekpalaniappan69@gmail.com',
     description='Portfolio Optimisation and Analytics',
-    install_requires = ["numpy", "pandas", "scikit-learn", "scipy"],
+    install_requires = ["numpy", "pandas", "scikit-learn", "scipy","rpy2"],
     python_requires = ">=3",
     project_urls = {
     "Documentation": "https://portfolioanalytics.readthedocs.io/en/latest/",
