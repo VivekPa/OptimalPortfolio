@@ -11,8 +11,8 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 import warnings
-import portfolioopt.utility_functions as utility_functions
-
+# import portfolioopt.utility_functions as utility_functions
+runfile('/home/sven/Documents/PyDox/OptimalPortfolio/portfolioopt/utility_functions.py', wdir='/home/sven/Documents/PyDox/OptimalPortfolio/portfolioopt')
 
 class OptimalAllocations:
     def __init__(self, n, mean, cov, tickers, weight_bounds=(0, 1)):
@@ -38,6 +38,8 @@ class OptimalAllocations:
         self.weights = None
         self.skew = None
         self.kurt = None
+        self.coskew = None
+        self.cokurt = None
 
     def moment_optimisation(self, skew, kurt, delta1, delta2, delta3, delta4):
         """
@@ -55,7 +57,29 @@ class OptimalAllocations:
         self.skew = skew
         self.kurt = kurt
         args = (self.mean, self.cov, skew, kurt, delta1, delta2, delta3, delta4)
-        result = minimize(utility_functions.moment_utility, x0=self.x0, args=args,
+        result = minimize(moment_utility, x0=self.x0, args=args,
+                               method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
+        self.weights = result["x"]
+        return dict(zip(self.tickers, self.weights))
+    
+    def comoment_optimisation(self, coskew, cokurt, delta1, delta2, delta3, delta4):
+        """
+        Calculates the optimal portfolio weights for utility functions that uses mean, covariance, coskewness and cokurtosis of
+        market invariants.
+
+        :param skew: coskewness matrix of market invariants
+        :param kurt: cokurtosis matrix of market invariants
+        :param delta1: relative optimization weight for mean
+        :param delta2: relative optimization weight for covariance
+        :param delta3: relative optimization weight for coskewness
+        :param delta4: relative optimization weight for cokurtosis
+        :return: dictionary of tickers and weights
+        
+        """
+        self.coskew = coskew
+        self.cokurt = cokurt
+        args = (self.mean, self.cov, coskew, cokurt, delta1, delta2, delta3, delta4)
+        result = minimize(comoment_utility, x0=self.x0, args=args,
                                method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
@@ -71,7 +95,7 @@ class OptimalAllocations:
         :rtype: dict
         """
         args = (self.mean, self.cov, risk_free_rate)
-        result = minimize(utility_functions.sharpe, x0=self.x0, args=args,
+        result = minimize(sharpe, x0=self.x0, args=args,
                                method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
         self.weights = result["x"]
         return dict(zip(self.tickers, self.weights))
@@ -89,7 +113,7 @@ class OptimalAllocations:
             self.weights, self.cov))
         mu = self.weights.dot(self.mean)
 
-        sharpe = -utility_functions.sharpe(self.weights, self.mean, self.cov, risk_free_rate)
+        sharpe = -sharpe(self.weights, self.mean, self.cov, risk_free_rate)
         print(f"Expected annual return: {100*mu}")
         print(f"Annual volatility: {100*sigma}")
         print(f"Sharpe Ratio: {sharpe}")

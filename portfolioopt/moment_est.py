@@ -27,13 +27,64 @@ import numpy as np
 from sklearn import covariance
 from sklearn.covariance.shrunk_covariance_ import ledoit_wolf_shrinkage
 from scipy.stats import moment
+import rpy2.robjects as robjects
+from rpy2.robjects.packages import importr
 import warnings
-from portfolioopt.exp_max import expectation_max
+# from portfolioopt.exp_max import expectation_max
+runfile('/home/sven/Documents/PyDox/OptimalPortfolio/portfolioopt/exp_max.py', wdir='/home/sven/Documents/PyDox/OptimalPortfolio/portfolioopt')
 
-
-def sample_skew(invariants, frequency=252):
+def sample_coM3(invariants):
     """
-    Calculates sample skew
+    Calculates sample third order co-moment matrix
+    Taps into the R package PerformanceAnalytics through rpy2
+
+    :param invariants: sample data of market invariants
+    :type invariants: pd.Dataframe
+    :param frequency: time horizon of projection, default set ot 252 days
+    :type frequency: int
+    :return: sample skew dataframe
+    """
+    
+    importr('PerformanceAnalytics')
+    if not isinstance(invariants, pd.DataFrame):
+        warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
+        invariants = pd.DataFrame(invariants)
+    p = invariants.shape[1]
+    coskew_function = robjects.r('M3.MM')
+    r_inv_vec = robjects.FloatVector(np.concatenate(invariants.values))
+    r_invariants = robjects.r.matrix(r_inv_vec,nrow=p,ncol=p)
+    r_M3 = coskew_function(r_invariants)
+    
+    return np.matrix(r_M3)
+
+def sample_coM4(invariants):
+    """
+    Calculates sample fourth order co-moment matrix
+    Taps into the R package PerformanceAnalytics through rpy2
+
+    :param invariants: sample data of market invariants
+    :type invariants: pd.Dataframe
+    :param frequency: time horizon of projection, default set ot 252 days
+    :type frequency: int
+    :return: sample skew dataframe
+    """
+    
+    importr('PerformanceAnalytics')
+    if not isinstance(invariants, pd.DataFrame):
+        warnings.warn("invariants not a pd.Dataframe", RuntimeWarning)
+        invariants = pd.DataFrame(invariants)
+    p = invariants.shape[1]
+    coskew_function = robjects.r('M4.MM')
+    r_inv_vec = robjects.FloatVector(np.concatenate(invariants.values))
+    r_invariants = robjects.r.matrix(r_inv_vec,nrow=p,ncol=p)
+    r_M4 = coskew_function(r_invariants)
+    
+    return np.matrix(r_M4)
+
+
+def sample_M3(invariants, frequency=252):
+    """
+    Calculates column-wise sample third moment 
 
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe
@@ -48,9 +99,9 @@ def sample_skew(invariants, frequency=252):
     return daily_skew*(frequency**1.5)
 
 
-def sample_kurt(invariants, frequency=252):
+def sample_M4(invariants, frequency=252):
     """
-    Calculates sample kurtosis
+    Calculates column-wise sample fourth moment
 
     :param invariants: sample data of market invariants
     :type invariants: pd.Dataframe

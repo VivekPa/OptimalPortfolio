@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(
-    name='PortfolioAnalytics',
-    version='0.0.1',
+    name='portfolioopt',
+    version='0.0.2',
     packages=['portfolioopt'],
     url='https://github.com/VivekPa/PortfolioAnalytics',
     license='MIT',
-    author='Vivek Palaniappan',
+    author='Vivek Palaniappan and Sven Serneels',
     author_email='vivekpalaniappan69@gmail.com',
-    description='Robust Portfolio Optimisation and Analytics',
+    description='Portfolio Optimisation and Analytics',
     install_requires = ["numpy", "pandas", "scikit-learn", "scipy"],
     python_requires = ">=3",
     project_urls = {
