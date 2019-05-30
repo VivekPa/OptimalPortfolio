@@ -6,14 +6,12 @@ class A:
     def __init__(self, n):
         self.n = n
 
-class B(A):
 
+class B(A):
     def __init__(self, k):
-        super().__init__(k)
         self.k = k
 
     def printing(self, a):
-
         print(self.n)
 
 l = B(4)
