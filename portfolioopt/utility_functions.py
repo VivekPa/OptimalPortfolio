@@ -36,8 +36,8 @@ def sharpe(weights, mean, cov, risk_free_rate=0.02):
     :return: negative Sharpe ratio
     :rtype: float
     """
-    mu = weights.dot(expected_returns)
-    sigma = np.sqrt(np.dot(weights, np.dot(cov_matrix, weights.T)))
+    mu = weights.dot(mean)
+    sigma = np.sqrt(np.dot(weights, np.dot(cov, weights.T)))
     return -(mu - risk_free_rate) / sigma
 
 
@@ -49,7 +49,7 @@ def volatility(weights, cov):
     :return: portfolio variance
     :rtype: float
     """
-    portfolio_volatility = np.dot(weights.T, np.dot(cov_matrix, weights))
+    portfolio_volatility = np.dot(weights.T, np.dot(cov, weights))
     return portfolio_volatility
 
 
@@ -71,6 +71,27 @@ def moment_utility(weights, mean, cov, skew, kurt, delta1, delta2, delta3, delta
               delta2 * (np.dot(np.dot(np.transpose(weights), cov), weights)) + \
               delta3 * (np.dot(np.dot(np.transpose(weights), skew), weights)) - \
               delta4 * (np.dot(np.dot(np.transpose(weights), kurt), weights))
+    return -utility
+
+
+def comoment_utility(weights, mean, cov, coskew, cokurt, delta1, delta2, delta3, delta4):
+    """
+    Calculates the utility using mean, covariance, coskewness and cokurtosis of data.
+    :param weights: portfolio weights
+    :param mean: mean of market invariants
+    :param cov: covariance matrix of market invariants
+    :param skew: coskewness matrix of market invariants
+    :param kurt: cokurtosis matrix of market invariants
+    :param delta1: relative weight in optimization for mean
+    :param delta2: relative weight in optimization for covariance
+    :param delta3: relative weight in optimization for skew
+    :param delta4: relative weight in optimization for kurtosis
+    :return: portfolio utility
+    """
+    utility = delta1 * (np.dot(np.transpose(weights), mean)) - \
+              delta2 * (np.dot(np.dot(np.transpose(weights), cov), weights)) + \
+              delta3 * (np.dot(np.dot(np.transpose(x0), coskew), np.kron(x0,x0)))[0,0] - \
+              delta4 * (np.dot(np.dot(np.transpose(x0), cokurt), np.kron(np.kron(x0,x0),x0)))[0,0]
     return -utility
 
 

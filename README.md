@@ -62,6 +62,7 @@ Classical asset allocation is the efficient frontier allocation. This is also kn
 
 ### Higher Moment Optimisation
 The core principle of optimisation with higher moments is identical to any other optimisation: given some utility function and constraints, find the weights of each of the portfolio entries such that the utility function is maximised. The only difference is that the utility function in this case would contain as arguments, higher moments. Furthermore, by adding coefficients to each moment, we are able to take into account investor risk aversion and preferences.
+This version of the package includes higher moment optimization based on higher co-moments, which makes much more statistical sense than the column-wise higher order moments in the original package. 
 
 ### Compared to Sharpe Ratio
 When doing backtests, higher moment optimisation works better than using Sharpe ratio to optimise allocations.
