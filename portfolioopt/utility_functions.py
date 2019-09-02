@@ -90,8 +90,8 @@ def comoment_utility(weights, mean, cov, coskew, cokurt, delta1, delta2, delta3,
     """
     utility = delta1 * (np.dot(np.transpose(weights), mean)) - \
               delta2 * (np.dot(np.dot(np.transpose(weights), cov), weights)) + \
-              delta3 * (np.dot(np.dot(np.transpose(x0), coskew), np.kron(x0,x0)))[0,0] - \
-              delta4 * (np.dot(np.dot(np.transpose(x0), cokurt), np.kron(np.kron(x0,x0),x0)))[0,0]
+              delta3 * (np.dot(np.dot(np.transpose(weights), coskew), np.kron(weights,weights)))[0,0] - \
+              delta4 * (np.dot(np.dot(np.transpose(weights), cokurt), np.kron(np.kron(weights,weights),weights)))[0,0]
     return -utility
 
 
