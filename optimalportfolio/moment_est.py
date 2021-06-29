@@ -30,7 +30,7 @@ from scipy.stats import moment
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 import warnings
-# from portfolioopt.exp_max import expectation_max
+from portfolioopt.exp_max import expectation_max
 runfile('/home/sven/Documents/PyDox/OptimalPortfolio/portfolioopt/exp_max.py', wdir='/home/sven/Documents/PyDox/OptimalPortfolio/portfolioopt')
 
 def sample_coM3(invariants):
@@ -194,18 +194,15 @@ class MLE:
     - ``norm_est`` (calculates the normally distributed maximum likelihood estimate of mean, covariance, skew and kurtosis)
     - ``st_est`` (calculates the student-t distributed maximum likelihood estimate of mean, covariance, skew and kurtosis)
     """
-    def __init__(self, invariants, n, dist="normal"):
+    def __init__(self, invariants, n):
         """
 
         :param invariants: sample data of market invariants
         :type invariants: pd.Dataframe
         :param n: number of assets
         :type n: int
-        :param dist: choice of distribution: "normal"
-        :type dist: str
         """
         self.invariants = invariants
-        self.dist = dist
         self.n = n
         self.mean = None
         self.cov = None
@@ -219,11 +216,11 @@ class MLE:
         :return: dataframes of mean, covariance, skew and kurtosis
         :rtype: pd.Dataframe
         """
-        if self.dist == "normal":
-            self.mean = 1/self.n * np.sum(self.invariants)
-            self.cov = 1/self.n * np.dot((self.invariants - self.mean), np.transpose(self.invariants - self.mean))
-            self.skew = 0
-            self.kurt = 0
+        self.mean = 1/self.n * np.sum(self.invariants)
+        self.cov = 1/self.n * np.dot((self.invariants - self.mean), np.transpose(self.invariants - self.mean))
+        self.skew = 0
+        self.kurt = 0
+
         return self.mean, self.cov, self.skew, self.kurt
 
     def st_est(self):
@@ -233,10 +230,11 @@ class MLE:
         :return: dataframe of mean, covariance, skew and kurtosis
         :rtype: pd.Dataframe
         """
-        if self.dist == "student-t":
-            self.mean, self.cov = expectation_max(self.invariants, max_iter=1000)
-            self.skew = 0
-            self.kurt = 6
+        self.mean, self.cov = expectation_max(self.invariants, max_iter=1000)
+        self.skew = 0
+        self.kurt = 6
+
+        return self.mean, self.cov, self.skew, self.kurt
 
 
 class Shrinkage:
@@ -252,6 +250,7 @@ class Shrinkage:
 
     Public methods:
 
+    - ``exp_ledoit`` (calculates shrunk covariance using exponentially weighted covariance matrix and identity matrix)
     - ``param_mle`` (calculates manually shrunk covariance using nonparametric and maximum likelihood estimate of covariance matrix)
 
     """
@@ -296,6 +295,7 @@ class Shrinkage:
         cov = exp_cov(self.invariants)
         shrinkage = ledoit_wolf_shrinkage(cov, block_size=block_size)
         shrunk_cov = (1 - shrinkage) * cov + shrinkage * (np.trace(cov)/self.n) * np.identity(self.n)
+
         return shrunk_cov
 
     def param_mle(self, shrinkage):
@@ -310,4 +310,5 @@ class Shrinkage:
         mean, cov, skew, kurt = mle.norm_est(X)
         param_cov = exp_cov(self.invariants)
         shrunk_cov = (1 - shrinkage) * cov + shrinkage * param_cov
+        
         return shrunk_cov

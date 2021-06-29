@@ -2,12 +2,12 @@ import pandas as pd
 import numpy as np
 
 
-def expectation_max(data, max_iter=1000):
+def expectation_max_st(data, max_iter=1000):
     data = pd.DataFrame(data)
     mu0 = data.mean()
     c0 = data.cov()
 
-    for j in range(max_iter):
+    for _ in range(max_iter):
         w = []
         # perform the E part of algorithm
         for i in data:

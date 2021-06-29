@@ -5,10 +5,12 @@ not run into errors.
 
 Currently implemented:
 
-- mean, covariance, skew and kurtosis utility function
+- Four moment utility function
+- Expectation Maximisation (EM) algorithm for Student-t distribution
 """
 
 import numpy as np
+import pandas as pd 
 
 
 def mean(weights, mean):
@@ -90,9 +92,33 @@ def comoment_utility(weights, mean, cov, coskew, cokurt, delta1, delta2, delta3,
     """
     utility = delta1 * (np.dot(np.transpose(weights), mean)) - \
               delta2 * (np.dot(np.dot(np.transpose(weights), cov), weights)) + \
-              delta3 * (np.dot(np.dot(np.transpose(x0), coskew), np.kron(x0,x0)))[0,0] - \
-              delta4 * (np.dot(np.dot(np.transpose(x0), cokurt), np.kron(np.kron(x0,x0),x0)))[0,0]
+              delta3 * (np.dot(np.dot(np.transpose(weights), coskew), np.kron(weights,weights)))[0,0] - \
+              delta4 * (np.dot(np.dot(np.transpose(weights), cokurt), np.kron(np.kron(weights,weights),weights)))[0,0]
     return -utility
 
+def exp_max_st(data, max_iter=1000):
+    data = pd.DataFrame(data)
+    mu0 = data.mean()
+    c0 = data.cov()
 
+    for _ in range(max_iter):
+        w = []
+        # perform the E part of algorithm
+        for i in data:
+            wk = (5 + len(data))/(5 + np.dot(np.dot(np.transpose(i - mu0), np.linalg.inv(c0)), (i - mu0)))
+            w.append(wk)
+            w = np.array(w)
+
+        # perform the M part of the algorithm
+        mu = (np.dot(w, data))/(np.sum(w))
+
+        c = 0
+        for i in range(len(data)):
+            c += w[i] * np.dot((data[i] - mu0), (np.transpose(data[i] - mu0)))
+        cov = c/len(data)
+
+        mu0 = mu
+        c0 = cov
+
+    return mu0, c0
 
