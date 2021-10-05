@@ -27,8 +27,6 @@ def port_ret(w, exp_ret):
 
     return ret
 
-# def port_ret(w, exp_ret):
-
 # Define Constraints
 
 def LS_neutral(w, curr_price):

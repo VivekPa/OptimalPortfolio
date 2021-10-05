@@ -1,6 +1,8 @@
 """
-This ``opt_allocations`` module calculates the optimal portfolio weights given the mean, covariance of
-the data, for various utility functions. Currently implemented:
+This ``opt_allocations`` module contains Optimiser class, which optimises portfolio weights
+for a particular set of objective functions.
+
+Currently implemented:
 
 - Mean-Variance Optimisation (MVO)
 - Minimum Volatility
@@ -22,38 +24,92 @@ from . import cvx_functions as func
 
 
 class Optimiser(ConvexOptimiser):
+    """ 
+    The Optimiser class (inheriting ConvexOptimiser class) contains various optimisation methods to be called 
+    based on need. 
+    
+    Instance variables:
+    
+    - Inputs
+        - ``tickers`` - list
+        - ``exp_ret`` - pd.Series
+        - ``cov`` - pd.DataFrame
+        - ``weight_bounds`` - float tuple
+        
+    - Output
+        - ``weights`` - pd.Series
+        
+    Public Methods:
+    
+    - ``add_constraints()`` add a list of constraints (following DCP)
+    - ``add_objectives()`` add a list of objective functions to overall objective (convex)
+
+    - ``mean_variance()`` optimises weights for either maximum returns with variance limit, or minimum variance with return limit
+    - ``min_volatility()`` optimises weights for minimum volatility portfolio 
+    - ``max_sharpe()`` optimises weights for maximum sharpe ratio
+
+    - ``weight_tearsheet()`` generates annual returns, volatility and sharpe for a given set of weights
+    """
+
     def __init__(self, tickers, exp_ret, cov, weight_bounds=(0, 1)) -> None:
-        # self.tickers = tickers
+        """ 
+        :param tickers: list of tickers in portfolio
+        :type tickers: np.ndarray or pd.Series or list
+        :param exp_ret: expected return of each ticker
+        :type exp_ret: pd.Series
+        :param cov: covariance matrix of tickers
+        :type cov: pd.DataFrame
+        :param weight_bounds: lower and upper bounds on weights
+        :type weight_bounds: float tuple
+        """
         self.exp_ret = exp_ret
         self.cov = cov
 
         super().__init__(len(tickers), tickers, weight_bounds=weight_bounds)
 
-    # def solve(self, type='cvxpy', objective='max_sharpe', solver=None, solver_options=None, verbose=True):
-    #     if type == 'cvxpy':
-    #         if objective == 'max_sharpe':
-    #             self.inter = self._cvx_solve(solver=solver, solver_options=solver_options, verbose=verbose)
-    #             self.weights = self._fix_weights(self.inter.value/self.k.value)
-    #         else:
-    #             self.weights = self._cvx_solve(solver=solver, solver_options=solver_options, verbose=verbose)
-    #     else:
-    #         print("Solver not implemented...")
-
-    #     return self.weights
-
     def add_constraints(self, constraints):
+        """ 
+        Function to add multiple constraints into an optimisation problem.
+
+        :param constraints: list of constraints to be added
+        :type constraints: list(expressions)
+        """
         for i in constraints:
             curr_const = constraints[i]
 
             self._add_constraint(curr_const)
 
     def add_objectives(self, objectives):
+        """ 
+        Function to add multiple objectives into an optimisation problem.
+        
+        :param objectives: list of objectives to be added
+        :type objectives: list(functions)
+        """
         for i in objectives:
             curr_obj = objectives[i]
 
             self._add_objective(curr_obj)
 
     def mean_variance(self, threshold, type='variance', solver=None, solver_options=None, verbose=True, risk_free_rate=0.02):
+        """ 
+        Mean-Variance optimisation, with maximum returns (minimum volatility) with volatility (return) limit.
+
+        :param threshold: threshold limit for variance or returns
+        :type threshold: float
+        :param type: type of optimisation, 'variance' or 'returns'
+        :type type: str
+        :param solver: type of cvxpy solver to use, default None
+        :type solver: str
+        :param solver_options: dict of solver options for cvxpy
+        :type solver_options: dict()
+        :param verbose: whether to print steps
+        :type verbose: boolean
+        :param risk_free_rate: risk free rate parameter, default to 0.02
+        :type risk_free_rate: float
+        :return: weights
+        :rtype: pd.Series
+        """
         if type == 'variance':
             self.objective += func.port_vol(self._w, self.cov)
             self.constraints += [
@@ -72,7 +128,19 @@ class Optimiser(ConvexOptimiser):
 
         return self.weights
 
-    def min_volatility(self, solver=None, solver_options=None, verbose=True, ):
+    def min_volatility(self, solver=None, solver_options=None, verbose=True):
+        """
+        Minimum volatility optimisation
+
+        :param solver: type of cvxpy solver to use, default None
+        :type solver: str
+        :param solver_options: dict of solver options for cvxpy
+        :type solver_options: dict()
+        :param verbose: whether to print steps
+        :type verbose: boolean
+        :return: weights
+        :rtype: pd.Series
+        """
         self.objective = func.port_vol(self._w, self.cov)
 
         self.constraints = [cp.sum(self._w) == 1]
@@ -84,6 +152,20 @@ class Optimiser(ConvexOptimiser):
         # self.weights = self.solve()
 
     def max_sharpe(self, solver=None, solver_options=None, verbose=True, risk_free_rate=0.02):
+        """ 
+        Maximum Sharpe Ratio Optimisation
+        
+        :param solver: type of cvxpy solver to use, default None
+        :type solver: str
+        :param solver_options: dict of solver options for cvxpy
+        :type solver_options: dict()
+        :param verbose: whether to print steps
+        :type verbose: boolean
+        :param risk_free_rate: risk free rate parameter, default to 0.02
+        :type risk_free_rate: float
+        :return: weights
+        :rtype: pd.Series
+        """
         if solver_options == None:
             solver_options = {}
 
@@ -119,92 +201,26 @@ class Optimiser(ConvexOptimiser):
 
         return self.weights
 
+    def weight_tearsheet(self, weights, risk_free_rate=0.02, verbose=True):
+        """ 
+        Calculates annual returns, volatility and Sharpe ratio.
+        
+        :param weights: current (optimised) weights to use
+        :type weights: pd.Series
+        :param risk_free_rate: risk free rate parameter, default to 0.02
+        :type risk_free_rate: float
+        :param verbose: whether to print steps
+        :type verbose: boolean
+        """
+        ret = weights @ self.exp_ret
+        sigma = np.sqrt(cp.quad_form(weights, self.cov))
+        sharpe = (ret - risk_free_rate)/sigma
+
+        if verbose:
+            print(f"Annual Return: {round(100*ret, 3)}")
+            print(f"Annual Volatility: {round(100*sigma, 3)}")
+            print(f"Annual Sharpe: {round(sharpe, 3)}")
+
     
 
-        
 
-        
-            
-        
-
-
-# class OptimalAllocations:
-#     def __init__(self, n, mean, cov, tickers, weight_bounds=(0, 1)):
-#         """
-#         :param n: number of assets
-#         :type n: int
-#         :param mean: mean estimate of market invariants
-#         :type mean: pd.Dataframe
-#         :param cov: covariance estimate of market invariants
-#         :type cov: pd.Dataframe
-#         :param tickers: tickers of securities used
-#         :type tickers: list
-#         :param weight_bounds: bounds for portfolio weights.
-#         :type weight_bounds: tuple
-#         """
-#         self.n = n
-#         self.mean = mean
-#         self.cov = cov
-#         self.weight_bounds = (weight_bounds,)*self.n
-#         self.x0 = np.array([1 / self.n] * self.n)
-#         self.constraints = [{"type": "eq", "fun": lambda x: np.sum(x) - 1}]
-#         self.tickers = tickers
-#         self.weights = None
-#         self.skew = None
-#         self.kurt = None
-
-#     def moment_optimisation(self, skew, kurt, delta1, delta2, delta3, delta4):
-#         """
-#         Calculates the optimal portfolio weights for utility functions that uses mean, covariance, skew and kurtosis of
-#         market invariants.
-
-#         :param skew: skew of market invariants
-#         :param kurt: kurtosis of market invariants
-#         :param delta1: coefficient of mean, (i.e how much weight to give maximising mean)
-#         :param delta2: coefficient of covariance, (i.e how much weight to give minimising covariance)
-#         :param delta3: coefficient of skew, (i.e how much weight to give maximising skew)
-#         :param delta4: coefficient of kurtosis, (i.e how much weight to give minimising kurtosis)
-#         :return: dictionary of tickers and weights
-#         """
-#         self.skew = skew
-#         self.kurt = kurt
-#         args = (self.mean, self.cov, skew, kurt, delta1, delta2, delta3, delta4)
-#         result = minimize(utility_functions.moment_utility, x0=self.x0, args=args,
-#                                method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
-#         self.weights = result["x"]
-#         return dict(zip(self.tickers, self.weights))
-
-#     def sharpe_opt(self, risk_free_rate=0.02):
-#         """
-#         Maximise the Sharpe Ratio.
-
-#         :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02
-#         :type risk_free_rate: float, optional
-#         :raises ValueError: if ``risk_free_rate`` is non-numeric
-#         :return: asset weights for the Sharpe-maximising portfolio
-#         :rtype: dict
-#         """
-#         args = (self.mean, self.cov, risk_free_rate)
-#         result = minimize(utility_functions.sharpe, x0=self.x0, args=args,
-#                                method="SLSQP", bounds=self.weight_bounds, constraints=self.constraints)
-#         self.weights = result["x"]
-#         return dict(zip(self.tickers, self.weights))
-
-#     def portfolio_metrics(self, verbose=False, risk_free_rate=0.02):
-#         """
-#         After optimising, calculate (and optionally print) the return, volatility and Sharpe Ratio of the portfolio.
-
-#         :param risk_free_rate: risk-free rate of borrowing/lending, defaults to 0.02
-#         :type risk_free_rate: float, optional
-#         :return: expected return, volatility, Sharpe ratio.
-#         :rtype: (float, float, float)
-#         """
-#         sigma = np.sqrt(utility_functions.volatility(
-#             self.weights, self.cov))
-#         mu = self.weights.dot(self.mean)
-
-#         sharpe = -utility_functions.sharpe(self.weights, self.mean, self.cov, risk_free_rate)
-#         print(f"Expected annual return: {100*mu}")
-#         print(f"Annual volatility: {100*sigma}")
-#         print(f"Sharpe Ratio: {sharpe}")
-#         return mu, sigma, sharpe
