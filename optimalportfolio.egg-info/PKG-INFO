@@ -1,0 +1,14 @@
+Metadata-Version: 1.2
+Name: optimalportfolio
+Version: 0.0.3
+Summary: Portfolio Optimization libary in Python
+Home-page: https://github.com/VivekPa/OptimalPortfolio
+Author: Vivek Palaniappan and Sven Serneels
+Author-email: vivekpalaniappan69@gmail.com
+License: MIT
+Project-URL: Documentation, 
+Project-URL: Issues, https://github.com/VivekPa/OptimalPortfolio/issues
+Project-URL: Personal website, https://medium.com/engineer-quant
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3
