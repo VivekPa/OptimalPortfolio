@@ -1,17 +1,11 @@
-Welcome to Lumache's documentation!
-===================================
+OptimalPortfolio
+=================
 
-**Lumache** (/lu'make/) is a Python library for cooks and food lovers
-that creates recipes mixing random ingredients.
-It pulls data from the `Open Food Facts database <https://world.openfoodfacts.org/>`_
-and offers a *simple* and *intuitive* API.
+**OptimalPortfolio** is a Python library for portfolio optimisation, that allows traders 
+and portfolio managers to quickly apply an optimisation framework as part of their pipeline.
 
-Check out the :doc:`usage` section for further information, including
-how to :ref:`installation` the project.
-
-.. note::
-
-   This project is under active development.
+Installation
+============
 
 Contents
 --------
