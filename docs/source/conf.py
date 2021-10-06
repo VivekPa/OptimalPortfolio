@@ -2,12 +2,12 @@
 
 # -- Project information
 
-project = 'Lumache'
-copyright = '2021, Graziella'
-author = 'Graziella'
+project = 'OptimalPortfolio'
+copyright = '2021, Vivek Palaniappan'
+author = 'Vivek Palaniappan'
 
-release = '0.1'
-version = '0.1.0'
+release = '0.0.1'
+version = '0.0.1'
 
 # -- General configuration
 
