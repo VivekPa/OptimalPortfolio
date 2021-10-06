@@ -9,7 +9,7 @@
             alt="MIT license"></a> &nbsp;
 </p>
 
-**OptimalPortfolio** is an open source library for portfolio optimisation. This library extends classical portfolio optimisation methods for equities, options and bonds. Unlike modern portfolio theory (MPT), OptimalPortfolio takes into account the skew and kurtosis of the distribution of market invariants. Furthermore, novel methods of finding estimators of moments of the distribution is implemented.
+**OptimalPortfolio** is an open source library for portfolio optimisation. This library implements classical portfolio optimisation techniques for equities, but is also extendable for non-equity products given the right adjustments in invariants. Furthermore, certain modern advances in portfolio optimisation, such as Hierarchical Risk Parity is also implemented. 
 
 Regardless of whether you are a fundamental investor, or an algorithmic trader, this library can aid you in allocating your capital in the most risk efficient way, allowing to optimise your utility. *For more details on the project design and similar content, please check out [Engineer Quant](https://medium.com/engineer-quant)*
 
@@ -19,6 +19,7 @@ Regardless of whether you are a fundamental investor, or an algorithmic trader, 
 ## Contents
 - [Contents](#contents)
 - [Overview](#overview)
+- [Full Sequence](#full-sequence)
 - [Market Invariants](#market-invariants)
 - [Moment Estimation](#moment-estimation)
     - [Nonparametric Estimators](#nonparametric-estimators)
@@ -31,57 +32,94 @@ Regardless of whether you are a fundamental investor, or an algorithmic trader, 
 
 ## Overview
 This library aims to make optimising portfolios accessible to every trader and investor. To install this library, download it and run
-```python
-run setup.py
+```bash
+bash install.sh
 ```
 
+## Full Sequence
+The pipeline for using this library is delibrately modular, so as to allow users to incorporate their own proprietary stacks and code into the optimisation. The full sequence from data to weights is in the ``examples/full_sequence.ipynb`` notebook, but for clarity, it is
+
+- Acquire stock (or other asset class) data
+- Calculate market invariants (for stocks is returns)
+- Calculate moments of invariants (for simple mean-variance optimisation it is mean and covariance)
+- Optimise weights according to a utility function, subject to constraints, with moments of invariants as inputs
 
 ## Market Invariants
-The first step to optimising any portfolio is calculating market invariants. Market invariants are defined as aspects of market prices that have some determinable statistical behaviour over time. For stock prices, the compounded returns are the market invariants. So when we calculate these invariants, we can statistically model them and gain useful insight into their behaviour. So far, calculating market invariants of stock prices and forex prices have been implemented. I plan to calculate invariants for options and bonds but data acquisition is difficult.
+The first step to optimising any portfolio is calculating market invariants. Market invariants are defined as aspects of market prices that have some determinable statistical behaviour over time. For stock prices, the compounded returns are the market invariants. So when we calculate these invariants, we can statistically model them and gain useful insight into their behaviour. So far, calculating market invariants of stock prices. The same can be implemented for options and bonds, but data acquisition is an issue.
 
 ## Moment Estimation
-Once the market invariants have been calculated, it is time to model the statistical properties of the invariants. This is an actively researched and studied field and due to the nature of the complexity involved in modelling the statistical properties of large market data, there are several limitations in estimating the moments of the distributions. I have tried implementing cutting edge research in shrinkage estimators.
+Once the market invariants have been calculated, it is time to model the statistical properties of the invariants. This is an actively researched and studied field and due to the nature of the complexity involved in modelling the statistical properties of large market data, there are several limitations in estimating the moments of the distributions.
 
 ### Nonparametric Estimators
-The simplest method of estimating the mean and covariance of invariants are the sample mean and covariance. However, this can be extended by introducing weightage for the timestamps, i.e giving more weight to recent data than older data. One interesting approach I have taken is introducing exponentially weighted mean and covariance, which I read about [here](https://reasonabledeviations.science/2018/08/15/exponential-covariance/). I am now working on implementing exponential weightage for skew and kurtosis.
+The simplest method of estimating the mean and covariance of invariants are the sample mean and covariance. However, this can be extended by introducing weightage for the timestamps, i.e giving more weight to recent data than older data. One interesting approach I have taken is introducing exponentially weighted mean and covariance, which I read about [here](https://reasonabledeviations.science/2018/08/15/exponential-covariance/).
 
-### Maximum Likelihood Estimators
+<!-- ### Maximum Likelihood Estimators
 Maximum likelihood estimators (MLE) are intended to maximise the probability that the data points occur within a prescribed distribution. The procedure hence involves choosing a distribution or a class of distributions and then fitting the data to the distribution such that the log probability of the data points are maximised by the parameters of the distributions. This will in turn give us the optimal estimators of the distribution for market invariants. MLE has been implemented for the following distributions:
 
 - Multivariate Normal
 - Multivariate Student t
 
 The MLE estimate for Student-t distribution is computed using Expectation Maximisation (EM)
-algorithm. 
+algorithm.  -->
 
 ### Shrinkage Estimators
-Both nonparametric and MLE estimators require a large set of data and even then they might not produce the best estimators due to their inherent bias or lack there off. Akin to the bias-variance tradeoff in machine learning, too much bias and too much variance is not good in estimators. So, as a way to combine the two estimators, shrinkage was introduced. The idea is that you combine two weak estimators, one with high variance and the other with high bias, with some coefficient called the shrinkage coefficient, to produce a much better estimator. This is one of the cutting edge estimators and is still rigorously being researched. I have implemented shrinkage of nonparametric (exponential) estimates with MLE (student-t) estimates, with manual shrinkage. Working on finding the optimal shrinkage coefficient.
+Nonparametric estimators only converge to the population estimate as the number of independent, identically distribution (IID) data points tends to infinity. However, as anyone who has experimented with financial data will be aware, market data is everchaning, and in some cases the volume of data is minimal. In these circumstances, nonparametric estiamtors do not work as well as intended, and this will cause issues later on in the optimiser. 
+
+One method to circumvent this is to impose some known structure in the market data. This is the essence of shrinkage estimation. We _shrink_ the sample moment towards a structure that we know _a-priori_. 
+
+An example of shrinkage will be Ledoit-Wolf Single-Index Model Covariance Shrinkage. This approach assumes that stock returns are significantly influenced by market returns. So we model the stock returns as a linear regression of market returns
+
+$$
+\hat{r}_{i,t} = \alpha_{i} + \beta_{t} \hat{r}_{m, t} + \epsilon_{i,t} 
+$$
+
+We calculate $\beta$ and $\alpha$ from regression, and we assume the error $\epsilon$ is independent and normally distributed, i.e. $Cov(\epsilon_{i}, \epsilon_{j}) = 0$, $Cov(\hat{r}_m, \epsilon_{i}) = 0$, and $E[\epsilon] = 0$, $Var(\epsilon) = \sigma_{i}^2$. Given this, we let the shrinkage matrix be 
+
+$$
+F = \beta \beta^{T} \hat{\sigma}_{m} + \Sigma_{\epsilon}
+$$
+where $\Sigma_{\epsilon}$ is the diagonal matrix of error variances. We can now calculate the shrunk covariance matrix as 
+
+$$
+\Sigma = \alpha F + (1-\alpha) S
+$$
+
+We can go a step further by choosing $\alpha$ optimally, but for the sake of brevity, I will leave that to the interested reader to find. The source papers are in the \references directory for those interested. 
 
 ## Optimal Allocations
-Classical asset allocation is the efficient frontier allocation. This is also known as the mean-variance optimisation as it takes into account the estimators of the mean and variance. The procedure of optimisation involves choosing an utility function and optimising it for portfolio weights. However, it struggles to capture the fat tail behaviour and skewness of the market prices.
+Classical asset allocation is the efficient frontier allocation. This is also known as the mean-variance optimisation as it takes into account the estimators of the mean and variance. The procedure of optimisation involves choosing an utility function and optimising it for portfolio weights. So far, I have implmented Mean-Variance, Minimum Volatility and Maximum Sharpe Optimisation. 
 
-### Higher Moment Optimisation
+### Mean-Variance
+Mean-variance optimisation can take on two forms: maximising returns with a variance limit, or minimising variance with a return limit. Both forms call the same ``mean_variance()`` method in the ``Optimiser`` class.
+
+### Minimum Volatility
+Minimum volatility optimisation minimises volatility whilst constraining the weights to fit a certain portfolio profile (Long only, Long/Short)
+
+### Maximum Sharpe 
+Maximum Sharpe optimisation requires a little more nuance as maximising sharpe ratio is not a convex optimisation problem. Hence, we have to do a variable transformation, with a few assumptions, to convert the problem into a convex optimisation one. 
+
+<!-- ### Higher Moment Optimisation
 The core principle of optimisation with higher moments is identical to any other optimisation: given some utility function and constraints, find the weights of each of the portfolio entries such that the utility function is maximised. The only difference is that the utility function in this case would contain as arguments, higher moments. Furthermore, by adding coefficients to each moment, we are able to take into account investor risk aversion and preferences.
-This version of the package includes higher moment optimization based on higher co-moments, which makes much more statistical sense than the column-wise higher order moments in the original package. 
+This version of the package includes higher moment optimization based on higher co-moments, which makes much more statistical sense than the column-wise higher order moments in the original package.  -->
 
-### Compared to Sharpe Ratio
-When doing backtests, higher moment optimisation works better than using Sharpe ratio to optimise allocations.
+<!-- ### Compared to Sharpe Ratio
+When doing backtests, higher moment optimisation works better than using Sharpe ratio to optimise allocations. -->
 
 ## Roadmap
 I have the following planned out and am working on implementing them:
 
-- Market Invariants
-  - Calculating invariants for bonds and derivatives
+<!-- - Market Invariants
+  - Calculating invariants for bonds and derivatives -->
 
 - Nonparametric Estimators
   - Exponentially weighted skew and kurtosis
-- Maximum Likelihood Estimators
+<!-- - Maximum Likelihood Estimators
   - Student-t Distribution
-  - Stable Distributions
+  - Stable Distributions -->
 - Shrinkage Estimators
-  - Optimal choosing of shrinkage for Nonparametric+MLE shrinkage
   - Shrinkage for higher moments
+  - Optimal shrinkage coefficient for custom shrinkage matrices
 
 - Optimisations
-  - Copula based CVaR optimisation
-  - Monte Carlo simulations
+  - Extending Hierarchical Risk Parity
+  - Backtesting optimisation
