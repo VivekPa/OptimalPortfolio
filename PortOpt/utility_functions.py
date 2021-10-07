@@ -1,15 +1,42 @@
 """
 The ``utility_functions`` module provides common utility functions, mainly used interally.
-Those wanting to extend must take note of the requirements of scipy.optimize to
-not run into errors.
 
 Currently implemented:
 
-- mean, covariance, skew and kurtosis utility function
+- Data Fetcher from yfinance
+- Mean, Covariance, Skew and Kurtosis utility function
 """
 
+import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import yfinance as yf
 
+def get_data(tickers, interval, start, end):
+    """ 
+    Fetch stock data from yfinance, for particular interval and start/end dates.
+    :param tickers: list of tickers
+    :type tickers: list or pd.Series or pd.Index
+    :param interval: interval of data
+    :type interval: str
+    :param start: starting date
+    :type start: str "%Y%m%d"
+    :param end: ending date
+    :type end: str "%Y%m%d"
+    :return: dataset of stock data
+    :rtype: pd.DataFrame
+    """
+    full_prices = pd.DataFrame()
+    for i in tickers:
+        df = yf.download(i, interval=interval, start=start, end=end)['Adj Close']
+        print(f'{i} data downloaded...')
+
+        full_prices = pd.concat([full_prices, df], axis=1, sort=False)
+
+    full_prices.columns = tickers
+      
+    return full_prices
 
 def mean(weights, mean):
     """
@@ -36,8 +63,8 @@ def sharpe(weights, mean, cov, risk_free_rate=0.02):
     :return: negative Sharpe ratio
     :rtype: float
     """
-    mu = weights.dot(expected_returns)
-    sigma = np.sqrt(np.dot(weights, np.dot(cov_matrix, weights.T)))
+    mu = weights.dot(mean)
+    sigma = np.sqrt(np.dot(weights, np.dot(cov, weights.T)))
     return -(mu - risk_free_rate) / sigma
 
 
@@ -49,7 +76,7 @@ def volatility(weights, cov):
     :return: portfolio variance
     :rtype: float
     """
-    portfolio_volatility = np.dot(weights.T, np.dot(cov_matrix, weights))
+    portfolio_volatility = np.dot(weights.T, np.dot(cov, weights))
     return portfolio_volatility
 
 
