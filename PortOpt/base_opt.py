@@ -37,9 +37,9 @@ class ConvexOptimiser:
             self.constraints += [self._w >= self._lower]
             self.constraints += [self._w <= self._upper]
 
-    def _fix_weights(self, weights):
+    def _fix_weights(self, weights, threshold=1e-4):
         new_weights = pd.Series(weights, index=self.tickers)
-        # new_weights = new_weights.astype(int)
+        new_weights.loc[new_weights < threshold] = 0
 
         return new_weights
 
@@ -53,7 +53,7 @@ class ConvexOptimiser:
         if solver_options == None:
             solver_options = {}
         try:
-            self._problem = cp.Problem(cp.Minimize(self._objective), self.constraints)
+            self._problem = cp.Problem(cp.Minimize(self.objective), self.constraints)
 
             if solver == None:
                 self._problem.solve(verbose=verbose, **solver_options)

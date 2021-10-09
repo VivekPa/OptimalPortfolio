@@ -213,7 +213,7 @@ class Optimiser(ConvexOptimiser):
         :type verbose: boolean
         """
         ret = weights @ self.exp_ret
-        sigma = np.sqrt(cp.quad_form(weights, self.cov))
+        sigma = np.sqrt(cp.quad_form(weights, self.cov).value)
         sharpe = (ret - risk_free_rate)/sigma
 
         if verbose:

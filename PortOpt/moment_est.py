@@ -38,7 +38,7 @@ from .base_est import BaseEstimator
 
 class ExpReturns(BaseEstimator):
     def __init__(self, tickers) -> None:
-        super.__init__(tickers)
+        super().__init__(tickers)
 
     def avg_hist_ret(self, data, is_returns=False, period=1, frequency=252):
         if is_returns:
@@ -69,7 +69,7 @@ class ExpReturns(BaseEstimator):
 
 class RiskModel(BaseEstimator):
     def __init__(self, tickers) -> None:
-        super.__init__(tickers)
+        super().__init__(tickers)
 
     def avg_hist_cov(self, data, is_returns=False, period=1, frequency=252):
         if is_returns:
@@ -110,7 +110,7 @@ class Shrinkage(BaseEstimator):
         self.delta = None
         self.n = len(tickers)
 
-        super.__init__(tickers)
+        super().__init__(tickers)
 
     def _identity_shrinkage(self, data, delta=0.1, is_returns=True):
         if is_returns:
