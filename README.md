@@ -20,6 +20,11 @@ Regardless of whether you are a fundamental investor, or an algorithmic trader, 
 - [Contents](#contents)
 - [Overview](#overview)
 - [Full Sequence](#full-sequence)
+- [Functionality](#functionality)
+  - [Expected Returns](#expected-returns)
+  - [Risk Models](#risk-models)
+  - [Objective Functions](#objective-functions)
+  - [Constraints](#constraints)
 - [Market Invariants](#market-invariants)
 - [Moment Estimation](#moment-estimation)
     - [Nonparametric Estimators](#nonparametric-estimators)
@@ -43,6 +48,80 @@ The pipeline for using this library is delibrately modular, so as to allow users
 - Calculate market invariants (for stocks is returns)
 - Calculate moments of invariants (for simple mean-variance optimisation it is mean and covariance)
 - Optimise weights according to a utility function, subject to constraints, with moments of invariants as inputs
+
+```python
+import pandas as pd
+import numpy as np
+
+import PortOpt.invariants as invs
+import PortOpt.moment_est as moments
+from PortOpt.opt_allocations import Optimiser
+import PortOpt.utility_functions as utils
+
+tickers = ['AAPL', 'MSFT', 'CVX', 'GE', 'GOOGL']
+stock_data = utils.get_data(tickers, '1d', '2015-01-01', '2021-01-01')
+
+# Compute market invariants
+
+stock_returns = invs.stock_invariants(stock_data)
+
+riskmodel = moments.RiskModel(tickers)
+stock_cov = riskmodel.avg_hist_cov(stock_data)
+
+# Optimise weights according to mean-variance
+
+optimiser = Optimiser(tickers, exp_returns, stock_cov)
+weights = optimiser.mean_variance(threshold=0.1, type='variance')
+print(weights)
+weight_tearsheet(weights)
+```
+
+This should have the following output:
+```txt
+AAPL     0.182566
+MSFT     0.143655
+CVX      0.190582
+GE       0.117543
+GOOGL    0.365654
+
+Annual Return: 15.026
+Annual Volatility: 23.203
+Annual Sharpe: 0.561
+```
+
+## Functionality
+
+Listed below is the current overall functionality of the library, split into the various parts of the pipeline.
+
+### Expected Returns
+- Nonparametric
+  - Mean Historical Returns
+  - Mean Exponentially Weighted Returns
+  - Capital Asset Pricing Model (CAPM)
+- Shrinkage
+  - James-Stein Mean Shrinkage
+
+
+### Risk Models
+- Nonparametric
+  - Historical Covariance
+  - Exponentially Weighted Covariance
+- Covariance Shrinkage
+    - Identity Shrinkage
+    - Scaled Variance Shrinkage
+    - Ledoit-Wolf Single Index
+    - Ledoit-Wolf Constant Correlation
+
+### Objective Functions
+- Mean-Variance Optimisation
+  - Maximise Returns with a risk limit
+  - Minimise risk with a returns limit
+- Minimum Volatility
+- Maximum Sharpe Ratio
+
+### Constraints
+- Long Short Neutral
+- Maximum Position on an asset
 
 ## Market Invariants
 The first step to optimising any portfolio is calculating market invariants. Market invariants are defined as aspects of market prices that have some determinable statistical behaviour over time. For stock prices, the compounded returns are the market invariants. So when we calculate these invariants, we can statistically model them and gain useful insight into their behaviour. So far, calculating market invariants of stock prices. The same can be implemented for options and bonds, but data acquisition is an issue.
@@ -122,4 +201,5 @@ I have the following planned out and am working on implementing them:
 
 - Optimisations
   - Extending Hierarchical Risk Parity
+  - Higher Moment Optimisation
   - Backtesting optimisation
