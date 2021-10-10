@@ -101,7 +101,6 @@ Listed below is the current overall functionality of the library, split into the
 - Shrinkage
   - James-Stein Mean Shrinkage
 
-
 ### Risk Models
 - Nonparametric
   - Historical Covariance
@@ -122,6 +121,21 @@ Listed below is the current overall functionality of the library, split into the
 ### Constraints
 - Long Short Neutral
 - Maximum Position on an asset
+
+### Adding Custom Constraints/Objectives
+Since constraints are very case specific, I have added a functionality to be able to add your own constraints to the optimisation problem. We add a long/short neutral constraint using the custom method to demonstrate
+
+```python
+optimiser = Optimiser(tickers, exp_returns, stock_cov)
+
+# Add LS neutral constraint
+optimiser.add_constraints([lambda x: cp.sum(x) == 0])
+
+# Optimise for mean-variance
+weights = optimiser.mean_variance(threshold=0.1, type='variance')
+print(weights)
+weight_tearsheet(weights)
+```
 
 ## Market Invariants
 The first step to optimising any portfolio is calculating market invariants. Market invariants are defined as aspects of market prices that have some determinable statistical behaviour over time. For stock prices, the compounded returns are the market invariants. So when we calculate these invariants, we can statistically model them and gain useful insight into their behaviour. So far, calculating market invariants of stock prices. The same can be implemented for options and bonds, but data acquisition is an issue.
