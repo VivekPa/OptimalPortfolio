@@ -160,25 +160,25 @@ Nonparametric estimators only converge to the population estimate as the number 
 
 One method to circumvent this is to impose some known structure in the market data. This is the essence of shrinkage estimation. We _shrink_ the sample moment towards a structure that we know _a-priori_. 
 
-An example of shrinkage will be Ledoit-Wolf Single-Index Model Covariance Shrinkage. This approach assumes that stock returns are significantly influenced by market returns. So we model the stock returns as a linear regression of market returns
+An example of shrinkage will be Ledoit-Wolf Single-Index Model Covariance Shrinkage. This approach assumes that stock returns are significantly influenced by market returns. So we model the stock returns as a linear regression of market returns:
 
 $$
-\hat{r}_{i,t} = \alpha_{i} + \beta_{t} \hat{r}_{m, t} + \epsilon_{i,t} 
+\hat{r}_{i,t} = \alpha_{i} + \beta_{i} \hat{r}_{m, t} + \epsilon_{i,t}
 $$
 
-We calculate $\beta$ and $\alpha$ from regression, and we assume the error $\epsilon$ is independent and normally distributed, i.e. $Cov(\epsilon_{i}, \epsilon_{j}) = 0$, $Cov(\hat{r}_m, \epsilon_{i}) = 0$, and $E[\epsilon] = 0$, $Var(\epsilon) = \sigma_{i}^2$. Given this, we let the shrinkage matrix be 
+We calculate \(\beta_i\) and \(\alpha_i\) from regression, and we assume the error \(\epsilon\) is independent and normally distributed, i.e., \(\text{Cov}(\epsilon_i, \epsilon_j) = 0\), \(\text{Cov}(\hat{r}_m, \epsilon_i) = 0\), and \(\mathbb{E}[\epsilon] = 0\), \(\text{Var}(\epsilon) = \sigma_i^2\). Given this, we let the shrinkage matrix be:
 
 $$
-F = \beta \beta^{T} \hat{\sigma}_{m} + \Sigma_{\epsilon}
+F = \beta \beta^T \hat{\sigma}_m^2 + \Sigma_{\epsilon}
 $$
 
-where $\Sigma_{\epsilon}$ is the diagonal matrix of error variances. We can now calculate the shrunk covariance matrix as 
+where \(\Sigma_{\epsilon}\) is the diagonal matrix of error variances. We can now calculate the shrunk covariance matrix as:
 
 $$
-\Sigma = \alpha F + (1-\alpha) S
+\Sigma = \alpha F + (1 - \alpha) S
 $$
 
-We can go a step further by choosing $\alpha$ optimally, but for the sake of brevity, I will leave that to the interested reader to find. The source papers are in the \references directory for those interested. 
+We can go a step further by choosing \(\alpha\) optimally, but for the sake of brevity, I will leave that to the interested reader to find. The source papers are in the references directory for those interested.
 
 ## Optimal Allocations
 Classical asset allocation is the efficient frontier allocation. This is also known as the mean-variance optimisation as it takes into account the estimators of the mean and variance. The procedure of optimisation involves choosing an utility function and optimising it for portfolio weights. So far, I have implmented Mean-Variance, Minimum Volatility and Maximum Sharpe Optimisation. 
