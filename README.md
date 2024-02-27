@@ -162,17 +162,20 @@ One method to circumvent this is to impose some known structure in the market da
 
 An example of shrinkage will be Ledoit-Wolf Single-Index Model Covariance Shrinkage. This approach assumes that stock returns are significantly influenced by market returns. So we model the stock returns as a linear regression of market returns
 
+
 $$
-\begin{align}
 \hat{r}_{i,t} = \alpha_{i} + \beta_{t} \hat{r}_{m, t} + \epsilon_{i,t} 
-\end{align}
 $$
 
+
 We calculate $\beta$ and $\alpha$ from regression, and we assume the error $\epsilon$ is independent and normally distributed, i.e. $Cov(\epsilon_{i}, \epsilon_{j}) = 0$, $Cov(\hat{r}_m, \epsilon_{i}) = 0$, and $E[\epsilon] = 0$, $Var(\epsilon) = \sigma_{i}^2$. Given this, we let the shrinkage matrix be 
+
 
 $$
 F = \beta \beta^{T} \hat{\sigma}_{m} + \Sigma_{\epsilon}
 $$
+
+
 where $\Sigma_{\epsilon}$ is the diagonal matrix of error variances. We can now calculate the shrunk covariance matrix as 
 
 $$
